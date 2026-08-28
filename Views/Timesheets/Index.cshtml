@@ -1,0 +1,116 @@
+@model VontaGenta.Models.TimesheetIndexViewModel
+
+@{
+    ViewData["Title"] = "Timesheets";
+}
+
+<h1>Timesheets</h1>
+
+<form asp-action="Index" asp-controller="Timesheets" class="form-inline">
+    <label class="ml-0 pl-0 pr-2">Show Timesheets on</label>
+    <input class="form-control mb-2 mr-sm-2 datefield" type="text" asp-for="@Model.FilterByDate" placeholder="Date" value="@Model.FilterByDate?.ToString("dd MMM yyyy")" />
+    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+</form>
+
+<a asp-action="Index" asp-route-FilterByDate="@Model.PreviousDay?.ToString("yyyy-MM-dd")">Previous day</a>
+<a asp-action="Index" asp-route-FilterByDate="@Model.Today.ToString("yyyy-MM-dd")">Today</a>
+<a asp-action="Index" asp-route-FilterByDate="@Model.NextDay?.ToString("yyyy-MM-dd")">Next day</a>
+
+<p>
+    <a asp-action="Create" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.DateStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.TimeStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.DateEnd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.TimeEnd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.Duration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timesheet.ProjectName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Timesheets)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @item.DateStart.ToString("dd-MMM-yyyy")
+                </td>
+                <td>
+                    @item.TimeStart.ToString("HH:mm")
+                </td>
+                <td>
+                    @if (item.DateEnd != null)
+                    {
+                        @item.DateEnd.Value.ToString("dd-MMM-yyyy")
+                    }
+                </td>
+                <td>
+                    @if (item.TimeEnd != null)
+                    {
+                        @item.TimeEnd.Value.ToString("HH:mm")
+                    }
+                </td>
+                <td>
+                    @item.Duration
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<span>
+    @foreach (KeyValuePair<string, TimeSpan> timeByProject in Model.TotalTimePerProject)
+    {
+        @timeByProject.Key
+        <span>total time:</span>
+ 
+        @timeByProject.Value.ToString(@"hh\:mm")
+    
+        <br />
+    }
+</span>
+
+@*Only enable for more advanced version.*@
+@if (Model.SystemVersion > 1.0) {
+    @if (Model.FilterByDate == new DateTime(Model.Today.Year, Model.Today.Month, Model.Today.Day))
+    {
+        <form asp-action="EndTimesheet" asp-controller="Timesheets" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")" class="form-inline">
+            <button type="submit" class="btn btn-primary mt-2 mb-2">End Timesheet</button>
+        </form>
+    }
+}

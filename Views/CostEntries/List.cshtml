@@ -1,0 +1,91 @@
+@model VontaGenta.Models.CostEntryListViewModel
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-page="@Model.Page" asp-route-itemsPerPage="@Model.ItemsPerPage">Create New</a>
+</p>
+
+<a asp-action="List" asp-route-page="@Model.Page" asp-route-itemsPerPage="@Model.ItemsPerPage">Current month</a>
+<form method="get">
+    <div class="row mt-2">
+        <div class="col">
+            <select asp-for="Month" asp-items="Model.MonthsSelectList"></select>
+            @Html.EditorFor(m => m.Year)
+            <input type="submit" value="Go" class="btn btn-primary" />
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col pagination-font-sm">
+            Page @Html.TextBoxFor(m => m.Page, null, new { @class = "pagination-input-m" }) of @Model.TotalPages pages.
+            @Html.TextBoxFor(m => m.ItemsPerPage, null, new { @class = "pagination-input-m" }) items per page
+            <input type="submit" value="go" class="btn btn-secondary btn-sm py-0" />
+        </div>
+    </div>
+</form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.CategoryName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.Amount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.UserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CostEntry.ProjectName)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.List)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date, "Date")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CategoryName)
+                    </td>
+                    <td>
+                        @item.CurrencySymbol@item.Amount.ToString("N2")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProjectName)
+                    </td>
+                    <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-page="@Model.Page" asp-route-itemsPerPage="@Model.ItemsPerPage">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-page="@Model.Page" asp-route-itemsPerPage="@Model.ItemsPerPage">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID" asp-route-year="@Model.Year" asp-route-month="@Model.Month" asp-route-page="@Model.Page" asp-route-itemsPerPage="@Model.ItemsPerPage">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

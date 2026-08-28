@@ -1,0 +1,49 @@
+@model VontaGenta.Models.OrgDetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Org</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    @if (Model.ShowEditLink)
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> <text>|</text>
+    }
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<div>
+    <h4>Org members</h4>
+    <hr />
+    @foreach (var name in Model?.OrgMembers ?? [])
+    {
+        <p>@name</p>
+    }
+</div>

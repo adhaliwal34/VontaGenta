@@ -1,0 +1,168 @@
+@model VontaGenta.Models.OrgIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<h2>My orgs</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.UserName)
+            </th>
+            <th>
+                Is active org
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.OrgsOwned) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <text>✔</text>
+                }
+                else
+                {
+                    <form asp-action="SetActiveOrg">
+                        <input type="hidden" name="Id" value="@item.ID" />
+                        <button type="submit" class="btn btn-link">Set active</button>
+                    </form>
+                }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a> |
+                <a asp-action="AddInvites" asp-route-id="@item.ID">Invite to org</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@if (Model.OrgInvites.Any())
+{
+    <h2>Org Invites</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Org.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Org.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Org.UserName)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrgInvites)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Org.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Org.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Org.User.Name)
+                    </td>
+                    <td class="clearfix">
+                        <form asp-action="AcceptInvite" class="float-start">
+                            <input type="hidden" name="Id" value="@item.ID" />
+                            <button type="submit" class="btn btn-link">Accept</button>
+                        </form>
+                        <form asp-action="DeleteInviteConfirmation" class="float-end">
+                            <input type="hidden" name="Id" value="@item.ID" />
+                            <button type="submit" class="btn btn-link">Ignore</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Orgs I've joined</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Org.UserName)
+            </th>
+            <th>
+                Is active org
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.OrgsJoined) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <text>✔</text>
+                }
+                else
+                {
+                    <form asp-action="SetActiveOrg">
+                        <input type="hidden" name="Id" value="@item.ID" />
+                        <button type="submit" class="btn btn-link">Set active</button>
+                    </form>
+                }
+            </td>
+            <td>
+                <a asp-action="Leave" asp-route-id="@item.ID">Leave</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

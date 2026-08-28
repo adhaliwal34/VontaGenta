@@ -1,27 +1,104 @@
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using VontaGenta.Data;
+using VontaGenta.DependencyInjection;
+using VontaGenta.Entities;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext();  // Optional: Adds context like request info
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
+var majorVersion = int.Parse(builder.Configuration["Database:Major_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
+var minorVersion = int.Parse(builder.Configuration["Database:Minor_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
+var patchVersion = int.Parse(builder.Configuration["Database:Patch_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
+
 // Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContext");
+// ApplicationDbContext is added with Scoped lifetime by default.
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(majorVersion, minorVersion, patchVersion))));
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAppTimeZonesServices();
+
+builder.Services.AddAppUsersServices();
+
+builder.Services.AddClientsServices();
+
+builder.Services.AddCurrenciesServices();
+
+builder.Services.AddCostCategoriesServices();
+
+builder.Services.AddCostEntriesServices();
+
+builder.Services.AddEmailsServices();
+
+builder.Services.AddHcaptchaServices();
+
+builder.Services.AddOrgsServices();
+
+builder.Services.AddProjectsServices();
+
+builder.Services.AddRevenuesServices();
+
+builder.Services.AddTimesheetsServices();
+
+builder.Services.AddUnitOfWorkServices();
+
+builder.Services.AddAutoMapper(
+    cfg => cfg.LicenseKey = builder.Configuration["Licenses:AutoMapper"] ?? throw new ArgumentNullException("AutoMapper license missing"),
+    typeof(Program).Assembly
+);
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseMigrationsEndPoint();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Add custom middleware HERE (after auth/session, before MVC)
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
+
+Console.WriteLine("Running app now...");
 
 app.Run();
+
+// cSpell:ignore serilog hcaptcha

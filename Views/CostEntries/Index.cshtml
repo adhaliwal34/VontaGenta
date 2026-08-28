@@ -1,0 +1,15 @@
+@model VontaGenta.Models.CostEntryIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" asp-route-year="@Model.Year" asp-route-month="@Model.Month">Create New</a>
+</p>
+<p>
+    <a asp-action="List">List</a>
+</p>
+

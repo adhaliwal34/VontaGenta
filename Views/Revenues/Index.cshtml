@@ -1,0 +1,64 @@
+@model VontaGenta.Models.RevenueIndexViewModel
+
+@{
+    ViewData["Title"] = "Revenues";
+}
+
+<h1>Revenues</h1>
+
+<form asp-action="Index" asp-controller="Revenues" class="form-inline">
+    <label class="ml-0 pl-0 pr-2">Show Revenues on</label>
+    <input class="form-control mb-2 mr-sm-2 datefield" type="text" asp-for="@Model.FilterByDate" placeholder="Date" value="@Model.FilterByDate?.ToString("dd MMM yyyy")" />
+    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+</form>
+
+<a asp-action="Index" asp-route-FilterByDate="@Model.PreviousDay?.ToString("yyyy-MM-dd")">Previous day</a>
+<a asp-action="Index" asp-route-FilterByDate="@Model.Today.ToString("yyyy-MM-dd")">Today</a>
+<a asp-action="Index" asp-route-FilterByDate="@Model.NextDay?.ToString("yyyy-MM-dd")">Next day</a>
+
+<p>
+    <a asp-action="Create" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Revenue.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Revenue.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Revenue.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Revenue.ProjectName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Revenues)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @item.CurrencySymbol@item.Amount.ToString("N2")
+                </td>
+                <td>
+                    @item.Date.ToString("dd-MMM-yyyy")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID" asp-route-FilterByDate="@Model.FilterByDate?.ToString("yyyy-MM-dd")">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -4,9 +4,11 @@ project.lock.json
 .DS_Store
 *.pyc
 nupkg/
+.certs
 
 # Visual Studio Code
 .vscode
+*.code-workspace
 
 # Rider
 .idea
@@ -41,5 +43,3 @@ appsettings.*
 
 # Logs
 [Ll]ogs/
-
-*_git_ignore.json

@@ -1,0 +1,8 @@
+﻿@model string?
+@{
+    // TODO Improve this code to get the label as string.
+}
+<div class="form-group">
+    @Html.LabelForModel()
+    <span>@(Model != null ? Model : "")</span>
+</div>
