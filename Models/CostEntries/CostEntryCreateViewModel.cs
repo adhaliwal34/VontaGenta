@@ -8,7 +8,8 @@ namespace VontaGenta.Models
     {
         public int ID { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        [Display(Name = "Date")]
+        public DateTime EntryDate { get; set; }
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
@@ -37,7 +38,7 @@ namespace VontaGenta.Models
 
         public CostEntryCreateViewModel()
         {
-            Date = DateTime.Today;
+            EntryDate = DateTime.Today;
             ProjectList = [];
         }
     }

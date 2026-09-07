@@ -107,7 +107,7 @@ namespace VontaGenta.Controllers
             var vm = new RevenueCreateViewModel
             {
                 FilterByDate = filterByDate ?? userTzNow,
-                Date = filterByDate == null || filterByDate.Value.Date == userTzNow.Date ? userTzNow : new DateTime(filterByDate.Value.Year, filterByDate.Value.Month, filterByDate.Value.Day, 0, 0, 0),
+                EntryDate = filterByDate == null || filterByDate.Value.Date == userTzNow.Date ? userTzNow : new DateTime(filterByDate.Value.Year, filterByDate.Value.Month, filterByDate.Value.Day, 0, 0, 0),
             };
 
             if (filterByDate == null)
@@ -115,7 +115,7 @@ namespace VontaGenta.Controllers
                 filterByDate = userTzNow;
             }
 
-            var dto = _revenuesService.GetNewRevenue(user.Id, user.TimeZone.ZoneId, vm.Date);
+            var dto = _revenuesService.GetNewRevenue(user.Id, user.TimeZone.ZoneId, vm.EntryDate);
 
             if (!dto.IsSuccess) {
                 SetError(dto.Error);
@@ -138,7 +138,7 @@ namespace VontaGenta.Controllers
         // POST: Revenues/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Description,Amount,CurrencyID,Date,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create([Bind("Description,Amount,CurrencyID,EntryDate,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new Exception("Logged in user not found");
 
@@ -252,7 +252,7 @@ namespace VontaGenta.Controllers
         // POST: Revenues/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,Description,Amount,CurrencyID,Date,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit([Bind("ID,Description,Amount,CurrencyID,EntryDate,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
         {
 
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new Exception("Logged in user not found");

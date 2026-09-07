@@ -236,7 +236,7 @@ DROP TABLE IF EXISTS `CostEntries`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `CostEntries` (
   `ID` int NOT NULL AUTO_INCREMENT,
-  `Date` datetime NOT NULL,
+  `EntryDate` datetime NOT NULL,
   `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `CategoryID` int NOT NULL DEFAULT '0',
@@ -380,7 +380,7 @@ DROP TABLE IF EXISTS `Revenues`;
 CREATE TABLE `Revenues` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `Description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `Date` datetime NOT NULL,
+  `EntryDate` datetime NOT NULL,
   `Amount` decimal(9,2) NOT NULL DEFAULT '0.00',
   `AppUserID` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `ProjectID` int NOT NULL DEFAULT '0',

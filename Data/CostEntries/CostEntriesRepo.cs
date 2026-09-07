@@ -27,9 +27,9 @@ namespace VontaGenta.Data
                         INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
                         WHERE UserOrgs.AppUserID = @AppUserId
                             AND UserOrgs.OrgID = @OrgId
-                            AND YEAR(CostEntries.Date) = @Year
-                            AND MONTH(CostEntries.Date) = @Month
-                        ORDER BY CostEntries.Date;";
+                            AND YEAR(CostEntries.EntryDate) = @Year
+                            AND MONTH(CostEntries.EntryDate) = @Month
+                        ORDER BY CostEntries.EntryDate;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -69,9 +69,9 @@ namespace VontaGenta.Data
                         INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
                         WHERE UserOrgs.AppUserID = @AppUserId
                             AND UserOrgs.OrgID = @OrgId
-                            AND YEAR(CostEntries.Date) = @Year
-                            AND MONTH(CostEntries.Date) = @Month
-                        ORDER BY CostEntries.Date
+                            AND YEAR(CostEntries.EntryDate) = @Year
+                            AND MONTH(CostEntries.EntryDate) = @Month
+                        ORDER BY CostEntries.EntryDate
                         LIMIT @Limit OFFSET @offset;";
 
                 var command = new CommandDefinition(
@@ -182,9 +182,9 @@ namespace VontaGenta.Data
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { costEntry.Date, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.Amount, costEntry.CurrencyID, costEntry.AppUserID, costEntry.ProjectID };
-                var sql = @"INSERT CostEntries (Date, Name, Description, CategoryID, Amount, CurrencyID, AppUserID, ProjectID)
-                    VALUES (@Date, @Name, @Description, @CategoryID, @Amount, @CurrencyID, @AppUserID, @ProjectID); SELECT LAST_INSERT_ID();";
+                var parameters = new { costEntry.EntryDate, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.Amount, costEntry.CurrencyID, costEntry.AppUserID, costEntry.ProjectID };
+                var sql = @"INSERT CostEntries (EntryDate, Name, Description, CategoryID, Amount, CurrencyID, AppUserID, ProjectID)
+                    VALUES (@EntryDate, @Name, @Description, @CategoryID, @Amount, @CurrencyID, @AppUserID, @ProjectID); SELECT LAST_INSERT_ID();";
 
                 var command = new CommandDefinition(
                     sql,
@@ -214,9 +214,9 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 // AppUser is not modifiable.
-                var parameters = new { costEntry.ID, costEntry.Date, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.ProjectID, costEntry.Amount, costEntry.CurrencyID };
+                var parameters = new { costEntry.ID, costEntry.EntryDate, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.ProjectID, costEntry.Amount, costEntry.CurrencyID };
                 var sql = @"UPDATE CostEntries
-                            SET Date = @Date
+                            SET EntryDate = @EntryDate
                             ,Name = @Name
                             ,Description = @Description
                             ,CategoryID = @CategoryID

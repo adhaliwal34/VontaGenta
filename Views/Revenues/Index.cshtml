@@ -29,7 +29,7 @@
                 @Html.DisplayNameFor(model => model.Revenue.Amount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Revenue.Date)
+                @Html.DisplayNameFor(model => model.Revenue.EntryDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Revenue.ProjectName)
@@ -48,7 +48,7 @@
                     @item.CurrencySymbol@item.Amount.ToString("N2")
                 </td>
                 <td>
-                    @item.Date.ToString("dd-MMM-yyyy")
+                    @item.EntryDate.ToString("dd-MMM-yyyy")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ProjectName)

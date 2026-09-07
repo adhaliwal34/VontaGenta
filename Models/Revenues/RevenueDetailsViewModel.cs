@@ -11,7 +11,8 @@ namespace VontaGenta.Models
         public string Description { get; set; }
         public decimal Amount { get; set; }
         public string CurrencySymbol { get; set; }
-        public DateTime Date { get; set; }
+        [Display(Name = "Date")]
+        public DateTime EntryDate { get; set; }
         
         [Display(Name = "Project")]
         public string ProjectName { get; set; }

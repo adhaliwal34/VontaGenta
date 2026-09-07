@@ -6,7 +6,7 @@ namespace VontaGenta.Entities
     public class CostEntry
     {
         public int ID { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime EntryDate { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int CategoryID { get; set; }

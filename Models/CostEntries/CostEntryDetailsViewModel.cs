@@ -5,7 +5,8 @@ namespace VontaGenta.Models
     public class CostEntryDetailsViewModel
     {
         public int ID { get; set; }
-        public DateTime Date { get; set; }
+        [Display(Name = "Date")]
+        public DateTime EntryDate { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         [Display(Name = "Category")]

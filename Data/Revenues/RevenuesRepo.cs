@@ -18,7 +18,7 @@ namespace VontaGenta.Data
         {
             try
             {
-                var parameters = new { AppUserId = userId, Date = date, OrgId = orgId };
+                var parameters = new { AppUserId = userId, EntryDate = date, OrgId = orgId };
                 var sql = @"SELECT
                         Revenues.*
                         ,AspNetUsers.*
@@ -35,7 +35,7 @@ namespace VontaGenta.Data
                         INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
                         WHERE
                             Revenues.AppUserID = @AppUserId
-                            AND Revenues.Date = @Date
+                            AND Revenues.EntryDate = @EntryDate
                             AND UserOrgs.OrgID = @OrgId
                             AND UserOrgs.AppUserID = @AppUserId;";
 
@@ -138,9 +138,9 @@ namespace VontaGenta.Data
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.Date, revenue.AppUserID, revenue.ProjectID };
-                var sql = @"INSERT Revenues (Description, Amount, CurrencyID, Date, AppUserID, ProjectID)
-                            SELECT @Description, @Amount, @CurrencyID, @Date, @AppUserID, @ProjectID;";
+                var parameters = new { revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.EntryDate, revenue.AppUserID, revenue.ProjectID };
+                var sql = @"INSERT Revenues (Description, Amount, CurrencyID, EntryDate, AppUserID, ProjectID)
+                            SELECT @Description, @Amount, @CurrencyID, @EntryDate, @AppUserID, @ProjectID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -195,9 +195,9 @@ namespace VontaGenta.Data
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { revenue.ID, revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.Date, revenue.ProjectID };
+                var parameters = new { revenue.ID, revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.EntryDate, revenue.ProjectID };
                 var sql = @"UPDATE Revenues
-                            SET Description = @Description, Amount = @Amount, CurrencyID = @CurrencyID, Date = @Date, ProjectID = @ProjectID
+                            SET Description = @Description, Amount = @Amount, CurrencyID = @CurrencyID, EntryDate = @EntryDate, ProjectID = @ProjectID
                             WHERE Revenues.ID = @Id;";
 
                 var command = new CommandDefinition(

@@ -201,7 +201,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Date,Name,Description,CategoryID,Amount,CurrencyID,ProjectID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create([Bind("EntryDate,Name,Description,CategoryID,Amount,CurrencyID,ProjectID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
 
@@ -253,8 +253,8 @@ namespace VontaGenta.Controllers
             }
 
             // Redirect to date of entry
-            vm.Year = costEntry.Date.Year;
-            vm.Month = costEntry.Date.Month;
+            vm.Year = costEntry.EntryDate.Year;
+            vm.Month = costEntry.EntryDate.Month;
 
             SetStatus("Item saved. Displayed below for you to check...");
 
@@ -310,7 +310,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,Date,Name,Description,CategoryID,ProjectID,Amount,CurrencyID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit([Bind("ID,EntryDate,Name,Description,CategoryID,ProjectID,Amount,CurrencyID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
 

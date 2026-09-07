@@ -102,13 +102,13 @@ namespace VontaGenta.Services
 
                 if (date != null)
                 {
-                    revenue.Date = date.Value;
+                    revenue.EntryDate = date.Value;
                 }
                 else
                 {
                     var todayUserTz = _appTimeZonesService.ConvertFromUtcToTimeZone(timeZoneId, DateTime.UtcNow);
                     // Use midnight on date. Not interested in time.
-                    revenue.Date = new DateTime(todayUserTz.Year, todayUserTz.Month, todayUserTz.Day, 0, 0, 0);
+                    revenue.EntryDate = new DateTime(todayUserTz.Year, todayUserTz.Month, todayUserTz.Day, 0, 0, 0);
                 }
             }
             catch (Exception ex)

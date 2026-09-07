@@ -20,9 +20,9 @@
             <input type="hidden" asp-for="Page" />
             <input type="hidden" asp-for="ItemsPerPage" />
             <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                @Html.EditorFor(m => m.Date, "Date")
-                <span asp-validation-for="Date" class="text-danger"></span>
+                <label asp-for="EntryDate" class="control-label"></label>
+                @Html.EditorFor(m => m.EntryDate, "Date")
+                <span asp-validation-for="EntryDate" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>

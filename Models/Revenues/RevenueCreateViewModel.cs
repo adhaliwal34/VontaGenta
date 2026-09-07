@@ -24,7 +24,8 @@ namespace VontaGenta.Models
         public SelectList Currencies { get; set; }
 
         [Required]
-        public DateTime Date { get; set; }
+        [Display(Name = "Date")]
+        public DateTime EntryDate { get; set; }
 
         [Required]
         [Display(Name = "Project")]
