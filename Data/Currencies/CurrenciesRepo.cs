@@ -18,8 +18,8 @@ namespace VontaGenta.Data
             {
                 var sql = @"SELECT
                             *
-                            FROM Currencies
-                            ORDER BY Currencies.Name;";
+                            FROM currencies
+                            ORDER BY currencies.name;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -42,8 +42,8 @@ namespace VontaGenta.Data
                 var parameters = new { Id = id };
                 var sql = @"SELECT
                             *
-                            FROM Currencies
-                            WHERE Currencies.ID = @Id;";
+                            FROM currencies
+                            WHERE currencies.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,

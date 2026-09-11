@@ -1,4 +1,4 @@
-using MySqlConnector;
+using Npgsql;
 using System.Data;
 
 namespace VontaGenta.Data
@@ -17,9 +17,9 @@ namespace VontaGenta.Data
         ITimesheetsRepo Timesheets { get; }
         IUserOrgsRepo UserOrgs { get; }
 
-        MySqlConnection Connection { get; }
+        NpgsqlConnection Connection { get; }
         // Null because not all queries require a transaction
-        MySqlTransaction? Transaction { get; }
+        NpgsqlTransaction? Transaction { get; }
 
         Task BeginTransactionAsync(IsolationLevel level = IsolationLevel.ReadCommitted, CancellationToken ct = default);
         Task CommitAsync(CancellationToken ct = default);

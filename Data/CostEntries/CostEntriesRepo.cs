@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Dapper;
 
 namespace VontaGenta.Data
@@ -21,15 +21,14 @@ namespace VontaGenta.Data
                 var parameters = new { AppUserId = userId, OrgId = orgId, Year = year, Month = month };
                 var sql = @"SELECT
                         Count(*)
-                        FROM CostEntries
-                        INNER JOIN Projects ON Projects.ID = CostEntries.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND UserOrgs.OrgID = @OrgId
-                            AND YEAR(CostEntries.EntryDate) = @Year
-                            AND MONTH(CostEntries.EntryDate) = @Month
-                        ORDER BY CostEntries.EntryDate;";
+                        FROM costentries
+                        INNER JOIN projects ON projects.id = costentries.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND userorgs.orgid = @OrgId
+                            AND EXTRACT(YEAR FROM costentries.entrydate) = @Year
+                            AND EXTRACT(MONTH FROM costentries.entrydate) = @Month;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -55,23 +54,23 @@ namespace VontaGenta.Data
 
                 var parameters = new { AppUserId = userId, OrgId = orgId, Year = year, Month = month, Limit = itemsPerPage, Offset = (page-1) * itemsPerPage };
                 var sql = @"SELECT
-                        CostEntries.*
-                        ,AspNetUsers.*
-                        ,CostCategories.*
-                        ,Currencies.*
-                        ,Projects.*
-                        FROM CostEntries
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = CostEntries.AppUserID
-                        INNER JOIN CostCategories ON CostCategories.ID = CostEntries.CategoryID
-                        INNER JOIN Currencies ON Currencies.ID = CostEntries.CurrencyID
-                        INNER JOIN Projects ON Projects.ID = CostEntries.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND UserOrgs.OrgID = @OrgId
-                            AND YEAR(CostEntries.EntryDate) = @Year
-                            AND MONTH(CostEntries.EntryDate) = @Month
-                        ORDER BY CostEntries.EntryDate
+                        costentries.*
+                        ,aspnetusers.*
+                        ,costcategories.*
+                        ,currencies.*
+                        ,projects.*
+                        FROM costentries
+                        INNER JOIN aspnetusers ON aspnetusers.id = costentries.appuserid
+                        INNER JOIN costcategories ON costcategories.id = costentries.categoryid
+                        INNER JOIN currencies ON currencies.id = costentries.currencyid
+                        INNER JOIN projects ON projects.id = costentries.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND userorgs.orgid = @OrgId
+                            AND EXTRACT(YEAR FROM costentries.entrydate) = @Year
+                            AND EXTRACT(MONTH FROM costentries.entrydate) = @Month
+                        ORDER BY costentries.entrydate
                         LIMIT @Limit OFFSET @offset;";
 
                 var command = new CommandDefinition(
@@ -103,9 +102,9 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        CostEntries.*
-                        FROM CostEntries
-                        WHERE CostEntries.ID = @Id;";
+                        costentries.*
+                        FROM costentries
+                        WHERE costentries.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -129,23 +128,23 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id, AppUserId = userId };
                 var sql = @"SELECT
-                        CostEntries.*
-                        ,AspNetUsers.*
-                        ,Projects.*
-                        ,Clients.*
-                        ,Orgs.*
-                        ,CostCategories.*
-                        ,Currencies.*
-                        FROM CostEntries
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = CostEntries.AppUserID
-                        INNER JOIN Projects ON Projects.ID = CostEntries.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        INNER JOIN CostCategories ON CostCategories.ID = CostEntries.CategoryID
-                        INNER JOIN Currencies ON Currencies.ID = CostEntries.CurrencyID
-                        WHERE CostEntries.ID = @Id
-                            AND UserOrgs.AppUserID = @AppUserId;";
+                        costentries.*
+                        ,aspnetusers.*
+                        ,projects.*
+                        ,clients.*
+                        ,orgs.*
+                        ,costcategories.*
+                        ,currencies.*
+                        FROM costentries
+                        INNER JOIN aspnetusers ON aspnetusers.id = costentries.appuserid
+                        INNER JOIN projects ON projects.id = costentries.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        INNER JOIN costcategories ON costcategories.id = costentries.categoryid
+                        INNER JOIN currencies ON currencies.id = costentries.currencyid
+                        WHERE costentries.id = @Id
+                            AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -171,7 +170,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveCostEntry(CostEntry costEntry, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveCostEntry(CostEntry costEntry, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (costEntry == null)
             {
@@ -183,8 +182,8 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { costEntry.EntryDate, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.Amount, costEntry.CurrencyID, costEntry.AppUserID, costEntry.ProjectID };
-                var sql = @"INSERT CostEntries (EntryDate, Name, Description, CategoryID, Amount, CurrencyID, AppUserID, ProjectID)
-                    VALUES (@EntryDate, @Name, @Description, @CategoryID, @Amount, @CurrencyID, @AppUserID, @ProjectID); SELECT LAST_INSERT_ID();";
+                var sql = @"INSERT INTO costentries (entrydate, name, description, categoryid, amount, currencyid, appuserid, projectid)
+                    VALUES (@EntryDate, @Name, @Description, @CategoryID, @Amount, @CurrencyID, @AppUserID, @ProjectID) RETURNING id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -202,7 +201,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateCostEntry(CostEntry costEntry, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateCostEntry(CostEntry costEntry, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (costEntry == null)
             {
@@ -215,15 +214,15 @@ namespace VontaGenta.Data
 
                 // AppUser is not modifiable.
                 var parameters = new { costEntry.ID, costEntry.EntryDate, costEntry.Name, costEntry.Description, costEntry.CategoryID, costEntry.ProjectID, costEntry.Amount, costEntry.CurrencyID };
-                var sql = @"UPDATE CostEntries
-                            SET EntryDate = @EntryDate
-                            ,Name = @Name
-                            ,Description = @Description
-                            ,CategoryID = @CategoryID
-                            ,ProjectID = @ProjectID
-                            ,Amount = @Amount
-                            ,CurrencyID = @CurrencyID
-                            WHERE CostEntries.ID = @ID;";
+                var sql = @"UPDATE costentries
+                            SET entrydate = @EntryDate
+                            ,name = @Name
+                            ,description = @Description
+                            ,categoryid = @CategoryID
+                            ,projectid = @ProjectID
+                            ,amount = @Amount
+                            ,currencyid = @CurrencyID
+                            WHERE costentries.id = @ID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -241,7 +240,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteCostEntry(CostEntry costEntry, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteCostEntry(CostEntry costEntry, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (costEntry == null)
             {
@@ -253,7 +252,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = costEntry.ID };
-                var sql = @"DELETE FROM CostEntries WHERE CostEntries.ID = @Id;";
+                var sql = @"DELETE FROM costentries WHERE costentries.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -279,13 +278,13 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM CostEntries
-                            INNER JOIN Projects ON Projects.ID = CostEntries.ProjectID
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE CostEntries.ID = @Id
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM costentries
+                            INNER JOIN projects ON projects.id = costentries.projectid
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE costentries.id = @Id
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -308,15 +307,15 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, costEntry.CategoryID, costEntry.ProjectID, OrgId = orgId };
                 var sql = @"SELECT
-                            1
-                            FROM UserOrgs
-                            INNER JOIN Projects ON Projects.ID = @ProjectID
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN CostCategories ON CostCategories.ID = @CategoryID
-                            WHERE UserOrgs.AppUserID = @AppUserId
-                                AND UserOrgs.OrgID = @OrgId
-                                AND Clients.OrgID = @OrgId
-                                AND CostCategories.OrgID = @OrgId;";
+                            true
+                            FROM userorgs
+                            INNER JOIN projects ON projects.id = @ProjectID
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN costcategories ON costcategories.id = @CategoryID
+                            WHERE userorgs.appuserid = @AppUserId
+                                AND userorgs.orgid = @OrgId
+                                AND clients.orgid = @OrgId
+                                AND costcategories.orgid = @OrgId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -339,17 +338,17 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id, AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                            1
-                            FROM CostEntries
-                            INNER JOIN Projects ON Projects.ID = CostEntries.ProjectID
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            INNER JOIN CostCategories ON CostCategories.ID = CostEntries.CategoryID
-                            WHERE CostEntries.ID = @Id
-                                AND CostEntries.AppUserID = @AppUserId
-                                AND UserOrgs.AppUserID = @AppUserId
-                                AND UserOrgs.OrgID = @OrgId
-                                AND CostCategories.OrgID = @OrgId;";
+                            true
+                            FROM costentries
+                            INNER JOIN projects ON projects.id = costentries.projectid
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            INNER JOIN costcategories ON costcategories.id = costentries.categoryid
+                            WHERE costentries.id = @Id
+                                AND costentries.appuserid = @AppUserId
+                                AND userorgs.appuserid = @AppUserId
+                                AND userorgs.orgid = @OrgId
+                                AND costcategories.orgid = @OrgId;";
 
                 var command = new CommandDefinition(
                     sql,

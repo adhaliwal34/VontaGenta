@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Dapper;
 
 namespace VontaGenta.Data
@@ -30,18 +30,18 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                        Projects.*
-                        ,AspNetUsers.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Projects
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Projects.AppUserID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND Orgs.ID = @OrgID
-                        ORDER BY Projects.StartDate;";
+                        projects.*
+                        ,aspnetusers.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM projects
+                        INNER JOIN aspnetusers ON aspnetusers.id = projects.appuserid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND orgs.id = @OrgID
+                        ORDER BY projects.startdate;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -70,18 +70,18 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                        Projects.*
-                        ,AspNetUsers.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Projects
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Projects.AppUserID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND Orgs.ID = @OrgID
-                        ORDER BY Projects.StartDate;";
+                        projects.*
+                        ,aspnetusers.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM projects
+                        INNER JOIN aspnetusers ON aspnetusers.id = projects.appuserid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND orgs.id = @OrgID
+                        ORDER BY projects.startdate;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -110,9 +110,9 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Projects.*
-                        FROM Projects
-                        WHERE Projects.ID = @Id;";
+                        projects.*
+                        FROM projects
+                        WHERE projects.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -135,15 +135,15 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Projects.*
-                        ,AspNetUsers.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Projects
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Projects.AppUserID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        WHERE Projects.ID = @Id;";
+                        projects.*
+                        ,aspnetusers.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM projects
+                        INNER JOIN aspnetusers ON aspnetusers.id = projects.appuserid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        WHERE projects.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -166,7 +166,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveProject(Project project, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveProject(Project project, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (project == null)
             {
@@ -178,7 +178,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { project.Name, project.Description, project.StartDate, project.EndDate, project.AppUserID, project.ClientID };
-                var sql = @"INSERT Projects (Name, Description, StartDate, EndDate, AppUserID, ClientID)
+                var sql = @"INSERT INTO projects (name, description, startdate, enddate, appuserid, clientid)
                             SELECT @Name, @Description, @StartDate, @EndDate, @AppUserID, @ClientID;";
 
                 var command = new CommandDefinition(
@@ -197,7 +197,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateProject(Project project, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateProject(Project project, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (project == null)
             {
@@ -209,9 +209,9 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { project.ID, project.Name, project.Description, project.StartDate, project.EndDate, project.ClientID };
-                var sql = @"UPDATE Projects
-                            SET Name = @Name, Description = @Description, StartDate = @StartDate, EndDate = @EndDate, ClientID = @ClientID
-                            WHERE Projects.ID = @ID;";
+                var sql = @"UPDATE projects
+                            SET name = @Name, description = @Description, startdate = @StartDate, enddate = @EndDate, clientid = @ClientID
+                            WHERE projects.id = @ID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -229,7 +229,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteProject(Project project, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteProject(Project project, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (project == null)
             {
@@ -241,7 +241,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { project.ID };
-                var sql = @"DELETE FROM Projects WHERE Projects.ID = @ID;";
+                var sql = @"DELETE FROM projects WHERE projects.id = @ID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -270,13 +270,13 @@ namespace VontaGenta.Data
 
                 var parameters = new { ProjectId = projectId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Projects
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE UserOrgs.AppUserID = @AppUserId
-                                AND Projects.ID = @ProjectId;";
+                            true
+                            FROM projects
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE userorgs.appuserid = @AppUserId
+                                AND projects.id = @ProjectId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -300,12 +300,12 @@ namespace VontaGenta.Data
             {
                 var parameters = new { ClientId = clientId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Clients
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE Clients.ID = @ClientId
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM clients
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE clients.id = @ClientId
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -329,14 +329,14 @@ namespace VontaGenta.Data
             {
                 var parameters = new { ProjectId = projectId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Projects
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE Projects.ID = @ProjectId
-                                AND Projects.AppUserID = @AppUserId
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM projects
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE projects.id = @ProjectId
+                                AND projects.appuserid = @AppUserId
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,

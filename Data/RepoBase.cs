@@ -1,5 +1,5 @@
 using VontaGenta.Helpers;
-using MySqlConnector;
+using Npgsql;
 
 namespace VontaGenta.Data
 {
@@ -14,7 +14,7 @@ namespace VontaGenta.Data
             _logger = logger;
         }
 
-        protected MySqlConnection Connection => _uow.Connection;
-        protected MySqlTransaction? Transaction => _uow.Transaction;
+        protected NpgsqlConnection Connection => _uow.Connection;
+        protected NpgsqlTransaction? Transaction => _uow.Transaction;
     }
 }

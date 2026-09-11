@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Dapper;
 
 namespace VontaGenta.Data
@@ -20,22 +20,22 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId, FromDate = fromDate, ToDate = toDate };
                 var sql = @"SELECT
-                        Timesheets.*
-                        ,AspNetUsers.*
-                        ,Projects.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Timesheets
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Timesheets.AppUserID
-                        INNER JOIN Projects ON Projects.ID = Timesheets.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
+                        timesheets.*
+                        ,aspnetusers.*
+                        ,projects.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM timesheets
+                        INNER JOIN aspnetusers ON aspnetusers.id = timesheets.appuserid
+                        INNER JOIN projects ON projects.id = timesheets.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
                         WHERE
-                            Timesheets.AppUserID = @AppUserId
-                            AND Orgs.ID = @OrgId
-                            AND UserOrgs.AppUserID = @AppUserId
-                            AND (DateTimeStart <= @ToDate AND IFNULL(DateTimeEnd,'2050-12-31') >= @FromDate);";
+                            timesheets.appuserid = @AppUserId
+                            AND orgs.id = @OrgId
+                            AND userorgs.appuserid = @AppUserId
+                            AND (datetimestart <= @ToDate AND COALESCE(datetimeend, TIMESTAMP '2050-12-31') >= @FromDate);";
 
                 var command = new CommandDefinition(
                     sql,
@@ -72,14 +72,14 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, UtcDateTime = utcDateTime, UtcDateMidnight = utcDateMidnight };
                 var sql = @"SELECT
-                            Timesheets.*
-                            FROM Timesheets
+                            timesheets.*
+                            FROM timesheets
                             WHERE
-                                Timesheets.AppUserId = @AppUserId
-                                AND DateTimeStart >= @UtcDateMidnight
-                                AND DateTimeStart <= @UtcDateTime
-                                AND DateTimeEnd is null
-                                ORDER BY DESC DateTimeStart;";
+                                timesheets.appuserid = @AppUserId
+                                AND datetimestart >= @UtcDateMidnight
+                                AND datetimestart <= @UtcDateTime
+                                AND datetimeend is null
+                                ORDER BY datetimestart DESC;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -103,10 +103,10 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Timesheets.*
-                        FROM Timesheets
+                        timesheets.*
+                        FROM timesheets
                         WHERE
-                            Timesheets.ID = @Id;";
+                            timesheets.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -129,18 +129,18 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Timesheets.*
-                        ,AspNetUsers.*
-                        ,Projects.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Timesheets
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Timesheets.AppUserID
-                        INNER JOIN Projects ON Projects.ID = Timesheets.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
+                        timesheets.*
+                        ,aspnetusers.*
+                        ,projects.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM timesheets
+                        INNER JOIN aspnetusers ON aspnetusers.id = timesheets.appuserid
+                        INNER JOIN projects ON projects.id = timesheets.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
                         WHERE
-                            Timesheets.ID = @Id;";
+                            timesheets.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -164,7 +164,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveTimesheet(Timesheet timesheet, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveTimesheet(Timesheet timesheet, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (timesheet == null)
             {
@@ -176,7 +176,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { timesheet.Name, timesheet.Description, timesheet.DateTimeStart, timesheet.DateTimeEnd, timesheet.AppUserID, timesheet.ProjectID };
-                var sql = @"INSERT Timesheets (Name, Description, DateTimeStart, DateTimeEnd, AppUserID, ProjectID)
+                var sql = @"INSERT INTO timesheets (name, description, datetimestart, datetimeend, appuserid, projectid)
                             SELECT @Name, @Description, @DateTimeStart, @DateTimeEnd, @AppUserID, @ProjectID;";
 
                 var command = new CommandDefinition(
@@ -195,7 +195,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteTimesheet(Timesheet timesheet, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteTimesheet(Timesheet timesheet, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (timesheet == null)
             {
@@ -207,7 +207,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = timesheet.ID };
-                var sql = @"DELETE FROM Timesheets WHERE Timesheets.ID = @Id;";
+                var sql = @"DELETE FROM timesheets WHERE timesheets.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -225,7 +225,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateTimesheet(Timesheet timesheet, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateTimesheet(Timesheet timesheet, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (timesheet == null)
             {
@@ -237,9 +237,9 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { timesheet.ID, timesheet.Name, timesheet.Description, timesheet.DateTimeStart, timesheet.DateTimeEnd, timesheet.ProjectID };
-                var sql = @"UPDATE Timesheets
-                            SET Name = @Name, Description = @Description, DateTimeStart = @DateTimeStart, DateTimeEnd = @DateTimeEnd, ProjectID = @ProjectID
-                            WHERE Timesheets.ID = @Id;";
+                var sql = @"UPDATE timesheets
+                            SET name = @Name, description = @Description, datetimestart = @DateTimeStart, datetimeend = @DateTimeEnd, projectid = @ProjectID
+                            WHERE timesheets.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -266,14 +266,14 @@ namespace VontaGenta.Data
             {
                 var parameters = new { TimesheetId = timesheetId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Timesheets
-                            INNER JOIN Projects ON Projects.ID = Timesheets.ProjectID
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE Timesheets.ID = @TimesheetId
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM timesheets
+                            INNER JOIN projects ON projects.id = timesheets.projectid
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE timesheets.id = @TimesheetId
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -297,13 +297,13 @@ namespace VontaGenta.Data
             {
                 var parameters = new { ProjectId = projectId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Projects
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE Projects.ID = @ProjectId
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM projects
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE projects.id = @ProjectId
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -327,15 +327,15 @@ namespace VontaGenta.Data
             {
                 var parameters = new { TimesheetId = timesheetId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM Timesheets
-                            INNER JOIN Projects ON Projects.ID = Timesheets.ProjectID
-                            INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                            WHERE Timesheets.ID = @TimesheetId
-                                AND Timesheets.AppUserID = @AppUserId
-                                AND UserOrgs.AppUserID = @AppUserId;";
+                            true
+                            FROM timesheets
+                            INNER JOIN projects ON projects.id = timesheets.projectid
+                            INNER JOIN clients ON clients.id = projects.clientid
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                            WHERE timesheets.id = @TimesheetId
+                                AND timesheets.appuserid = @AppUserId
+                                AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -355,4 +355,4 @@ namespace VontaGenta.Data
         #endregion
     }
 }
-// cSpell:ignore tran IFNULL
+// cSpell:ignore tran

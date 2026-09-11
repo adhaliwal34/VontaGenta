@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Dapper;
 
 namespace VontaGenta.Data
@@ -19,16 +19,16 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                        CostCategories.*
-                        ,Orgs.*
-                        ,AspNetUsers.*
-                        FROM CostCategories
-                        INNER JOIN Orgs ON Orgs.ID = CostCategories.OrgID
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = CostCategories.AppUserID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = CostCategories.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND Orgs.ID = @OrgId
-                        ORDER BY CostCategories.Name;";
+                        costcategories.*
+                        ,orgs.*
+                        ,aspnetusers.*
+                        FROM costcategories
+                        INNER JOIN orgs ON orgs.id = costcategories.orgid
+                        INNER JOIN aspnetusers ON aspnetusers.id = costcategories.appuserid
+                        INNER JOIN userorgs ON userorgs.orgid = costcategories.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND orgs.id = @OrgId
+                        ORDER BY costcategories.name;";
 
 
                 var command = new CommandDefinition(
@@ -57,13 +57,13 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                            CostCategories.*
-                            ,Orgs.*
-                            ,AspNetUsers.*
-                            FROM CostCategories
-                            INNER JOIN Orgs ON Orgs.ID = CostCategories.OrgID
-                            INNER JOIN AspNetUsers ON AspNetUsers.ID = CostCategories.AppUserID
-                            WHERE CostCategories.ID = @Id;";
+                            costcategories.*
+                            ,orgs.*
+                            ,aspnetusers.*
+                            FROM costcategories
+                            INNER JOIN orgs ON orgs.id = costcategories.orgid
+                            INNER JOIN aspnetusers ON aspnetusers.id = costcategories.appuserid
+                            WHERE costcategories.id = @Id;";
 
                 var command = new CommandDefinition(
                                     sql,
@@ -85,7 +85,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveCategory(Category category, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (category == null)
             {
@@ -97,7 +97,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { category.Name, category.Description, AppUserId = category.AppUserID, OrgId = category.OrgID };
-                var sql = @"INSERT CostCategories (Name, Description, AppUserID, OrgID)
+                var sql = @"INSERT INTO costcategories (name, description, appuserid, orgid)
                             SELECT @Name, @Description, @AppUserId, @OrgId;";
 
 
@@ -117,7 +117,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateCategory(Category category, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (category == null)
             {
@@ -130,9 +130,9 @@ namespace VontaGenta.Data
 
                 // We don't want to change the existing Org or User.
                 var parameters = new { Id = category.ID, category.Name, category.Description };
-                var sql = @"UPDATE CostCategories
-                            SET Name = @Name, Description = @Description
-                            WHERE ID = @Id;";
+                var sql = @"UPDATE costcategories
+                            SET name = @Name, description = @Description
+                            WHERE id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -150,7 +150,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteCategory(Category category, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (category == null)
             {
@@ -162,7 +162,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = category.ID };
-                var sql = @"DELETE FROM CostCategories WHERE ID = @Id;";
+                var sql = @"DELETE FROM costcategories WHERE id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -188,11 +188,11 @@ namespace VontaGenta.Data
             {
                 var parameters = new { CategoryId = categoryId, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM CostCategories
-                            INNER JOIN UserOrgs ON UserOrgs.OrgID = CostCategories.OrgID
-                            WHERE UserOrgs.AppUserID = @AppUserId
-                                AND CostCategories.ID = @CategoryId;";
+                            true
+                            FROM costcategories
+                            INNER JOIN userorgs ON userorgs.orgid = costcategories.orgid
+                            WHERE userorgs.appuserid = @AppUserId
+                                AND costcategories.id = @CategoryId;";
 
                 var command = new CommandDefinition(
                                     sql,
@@ -215,10 +215,10 @@ namespace VontaGenta.Data
             {
                 var parameters = new { OrgId = category.OrgID, AppUserId = userId };
                 var sql = @"SELECT
-                            1
-                            FROM UserOrgs
-                            WHERE UserOrgs.AppUserID = @AppUserId
-                                AND UserOrgs.OrgID = @OrgId;";
+                            true
+                            FROM userorgs
+                            WHERE userorgs.appuserid = @AppUserId
+                                AND userorgs.orgid = @OrgId;";
 
                 var command = new CommandDefinition(
                                     sql,

@@ -1,6 +1,6 @@
 using VontaGenta.Entities;
 using Dapper;
-using MySqlConnector;
+using Npgsql;
 
 namespace VontaGenta.Data
 {
@@ -19,10 +19,10 @@ namespace VontaGenta.Data
             {
                 var parameters = new { OrgID = orgId };
                 var sql = @"SELECT
-                        UserOrgs.*, AspNetUsers.*
-                        FROM UserOrgs
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = UserOrgs.AppUserID
-                        WHERE UserOrgs.OrgID = @OrgID;";
+                        userorgs.*, aspnetusers.*
+                        FROM userorgs
+                        INNER JOIN aspnetusers ON aspnetusers.id = userorgs.appuserid
+                        WHERE userorgs.orgid = @OrgID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -49,10 +49,10 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                            1
-                            FROM UserOrgs
-                            WHERE UserOrgs.AppUserID = @AppUserId
-                            AND UserOrgs.OrgID = @OrgId;";
+                            true
+                            FROM userorgs
+                            WHERE userorgs.appuserid = @AppUserId
+                            AND userorgs.orgid = @OrgId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -69,7 +69,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> LeaveOrg(string userId, int orgId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> LeaveOrg(string userId, int orgId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (orgId == 0)
             {
@@ -81,10 +81,10 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = orgId, AppUserId = userId };
-                var sql = @"DELETE FROM UserOrgs
+                var sql = @"DELETE FROM userorgs
                                 WHERE
-                                OrgID = @Id
-                                AND AppUserID = @AppUserId;";
+                                orgid = @Id
+                                AND appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -109,13 +109,13 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId };
                 var sql = @"SELECT
-                            Orgs.*
-                            ,AspNetUsers.*
-                            FROM UserOrgs
-                            INNER JOIN Orgs ON Orgs.ID = UserOrgs.OrgID
-                            INNER JOIN AspNetUsers ON AspNetUsers.ID = Orgs.AppUserID
-                            WHERE UserOrgs.AppUserID = @AppUserID
-                            AND UserOrgs.IsActive = 1;";
+                            orgs.*
+                            ,aspnetusers.*
+                            FROM userorgs
+                            INNER JOIN orgs ON orgs.id = userorgs.orgid
+                            INNER JOIN aspnetusers ON aspnetusers.id = orgs.appuserid
+                            WHERE userorgs.appuserid = @AppUserID
+                            AND userorgs.isactive = true;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -136,7 +136,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SetActiveOrg(string userId, int orgId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SetActiveOrg(string userId, int orgId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
@@ -144,9 +144,9 @@ namespace VontaGenta.Data
 
                 // Set current active user org to not active.
                 var parameters1 = new { AppUserID = userId };
-                var sql1 = @"UPDATE UserOrgs SET IsActive = 0
-                            WHERE AppUserID = @AppUserID
-                            AND IsActive = 1;";
+                var sql1 = @"UPDATE userorgs SET isactive = false
+                            WHERE appuserid = @AppUserID
+                            AND isactive = true;";
 
                 var command = new CommandDefinition(
                     sql1,
@@ -159,9 +159,9 @@ namespace VontaGenta.Data
 
                 // Set new user org to active
                 var parameters2 = new { AppUserID = userId, OrgID = orgId };
-                var sql2 = @"UPDATE UserOrgs SET IsActive = 1
-                            WHERE AppUserID = @AppUserID
-                            AND OrgID = @OrgID;";
+                var sql2 = @"UPDATE userorgs SET isactive = true
+                            WHERE appuserid = @AppUserID
+                            AND orgid = @OrgID;";
 
                 command = new CommandDefinition(
                     sql2,

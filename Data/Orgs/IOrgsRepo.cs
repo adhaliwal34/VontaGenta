@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 
 namespace VontaGenta.Data
 {
@@ -8,8 +8,8 @@ namespace VontaGenta.Data
         Task<List<Org>?> GetOrgs(string userId, CancellationToken ct);
         Task<Org?> GetOrg(int orgId, string userId, CancellationToken ct);
         Task<Org?> GetOrgAndRelatedFields(int orgId, string userId, CancellationToken ct);
-        Task<int> SaveOrg(Org org, CancellationToken ct, MySqlTransaction? tx = null);
-        Task<int> UpdateOrg(Org org, string userId, CancellationToken ct, MySqlTransaction? tx = null);
-        Task<int> DeleteOrg(Org org, string userId, CancellationToken ct, MySqlTransaction? tx = null);
+        Task<int> SaveOrg(Org org, CancellationToken ct, NpgsqlTransaction? tx = null);
+        Task<int> UpdateOrg(Org org, string userId, CancellationToken ct, NpgsqlTransaction? tx = null);
+        Task<int> DeleteOrg(Org org, string userId, CancellationToken ct, NpgsqlTransaction? tx = null);
     }
 }

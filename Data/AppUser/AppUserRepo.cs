@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using System.Security.Claims;
 using Dapper;
 using VontaGenta.Helpers;
@@ -37,15 +37,15 @@ namespace VontaGenta.Data
             {
                 email = email.ToUpper();
                 var connectionString = _config["ConnectionStrings:ApplicationDbContext"];
-                using (var connection = new MySqlConnection(connectionString))
+                using (var connection = new NpgsqlConnection(connectionString))
                 {
                     var parameters = new { Email = email };
                     var sql = @"SELECT 
-                            AspNetUsers.*
-                            ,AppTimeZones.*
-                            FROM AspNetUsers
-                            INNER JOIN AppTimeZones ON AppTimeZones.ID = AspNetUsers.TimeZoneId
-                            WHERE AspNetUsers.NormalizedUserName = @Email;";
+                            aspnetusers.*
+                            ,apptimezones.*
+                            FROM aspnetusers
+                            INNER JOIN apptimezones ON apptimezones.id = aspnetusers.timezoneid
+                            WHERE aspnetusers.normalizedusername = @Email;";
                     return (await connection.QueryAsync<AppUser, AppTimeZone, AppUser>(sql, (appUser, appTimeZone) =>
                     {
                         appUser.TimeZone = appTimeZone;

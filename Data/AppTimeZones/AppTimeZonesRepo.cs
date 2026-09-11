@@ -15,7 +15,7 @@ namespace VontaGenta.Data
         {
             try
             {
-                var sql = @"SELECT AppTimeZones.* FROM AppTimeZones";
+                var sql = @"SELECT apptimezones.* FROM apptimezones";
 
                 var command = new CommandDefinition(
                     sql,

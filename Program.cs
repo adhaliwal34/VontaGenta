@@ -6,6 +6,8 @@ using VontaGenta.DependencyInjection;
 using VontaGenta.Entities;
 using Serilog;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
@@ -21,15 +23,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
-var majorVersion = int.Parse(builder.Configuration["Database:Major_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
-var minorVersion = int.Parse(builder.Configuration["Database:Minor_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
-var patchVersion = int.Parse(builder.Configuration["Database:Patch_Version"] ?? throw new ArgumentNullException("value cannot be is null"));
-
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContext");
 // ApplicationDbContext is added with Scoped lifetime by default.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(majorVersion, minorVersion, patchVersion))));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -101,4 +99,4 @@ Console.WriteLine("Running app now...");
 
 app.Run();
 
-// cSpell:ignore serilog hcaptcha
+// cSpell:ignore serilog hcaptcha npgsql

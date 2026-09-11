@@ -1,6 +1,6 @@
 using VontaGenta.Entities;
 using Dapper;
-using MySqlConnector;
+using Npgsql;
 using VontaGenta.Helpers;
 
 namespace VontaGenta.Data
@@ -25,8 +25,8 @@ namespace VontaGenta.Data
                 var parameters1 = new { Id = id, AppUserID = userId };
                 var sql1 = @"SELECT
                              1
-                             FROM UserOrgs
-                             WHERE OrgID = @Id AND AppUserID = @AppUserID;";
+                             FROM userorgs
+                             WHERE orgid = @Id AND appuserid = @AppUserID;";
 
                 var command = new CommandDefinition(
                     sql1,
@@ -44,8 +44,8 @@ namespace VontaGenta.Data
                 var parameters2 = new { Id = id };
                 var sql2 = @"SELECT
                             *
-                            FROM OrgInvites
-                            WHERE OrgID = @Id;";
+                            FROM orginvites
+                            WHERE orgid = @Id;";
 
                 command = new CommandDefinition(
                     sql2,
@@ -69,12 +69,12 @@ namespace VontaGenta.Data
                 var parameters = new { OrgInviteId = orgInviteId, AppUserId = userId };
                 var sql = @"SELECT
                             *
-                            FROM OrgInvites
-                            INNER JOIN Orgs ON Orgs.ID = OrgInvites.OrgID
-                            INNER JOIN AspNetUsers ON AspNetUsers.ID = Orgs.AppUserID
+                            FROM orginvites
+                            INNER JOIN orgs ON orgs.id = orginvites.orgid
+                            INNER JOIN aspnetusers ON aspnetusers.id = orgs.appuserid
                             WHERE
-                            OrgInvites.ToUserID = @AppUserId
-                            AND OrgInvites.ID = @OrgInviteId;";
+                            orginvites.touserid = @AppUserId
+                            AND orginvites.id = @OrgInviteId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -104,11 +104,11 @@ namespace VontaGenta.Data
                 var parameters = new { AppUserId = userId };
                 var sql = @"SELECT
                             *
-                            FROM OrgInvites
-                            INNER JOIN Orgs ON Orgs.ID = OrgInvites.OrgID
-                            INNER JOIN AspNetUsers ON AspNetUsers.ID = Orgs.AppUserID
+                            FROM orginvites
+                            INNER JOIN orgs ON orgs.id = orginvites.orgid
+                            INNER JOIN aspnetusers ON aspnetusers.id = orgs.appuserid
                             WHERE
-                            OrgInvites.ToUserID = @AppUserId;";
+                            orginvites.touserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -130,7 +130,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveOrgInvites(List<OrgInvite> orgInvites, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveOrgInvites(List<OrgInvite> orgInvites, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (orgInvites.Count == 0)
             {
@@ -144,15 +144,15 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var dapperHelper = new DapperHelper();
-                var colNames = new List<string> { "ToUserID", "OrgID" };
-                var sql = dapperHelper.PrepareBulkInsertStatement("OrgInvites", colNames, orgInvites.Count);
+                var colNames = new List<string> { "touserid", "orgid" };
+                var sql = dapperHelper.PrepareBulkInsertStatement("orginvites", colNames, orgInvites.Count);
 
                 // Prepare arguments
                 var queryParams = new DynamicParameters();
                 for (int i = 0; i < orgInvites.Count; i++)
                 {
-                    queryParams.Add($"ToUserID{i}", orgInvites[i].ToUserID, System.Data.DbType.Guid);
-                    queryParams.Add($"OrgID{i}", orgInvites[i].OrgID, System.Data.DbType.Int32);
+                    queryParams.Add($"touserid{i}", orgInvites[i].ToUserID, System.Data.DbType.String);
+                    queryParams.Add($"orgid{i}", orgInvites[i].OrgID, System.Data.DbType.Int32);
                 }
 
                 var command = new CommandDefinition(
@@ -171,18 +171,18 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> AcceptOrgInvite(OrgInvite orgInvite, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> AcceptOrgInvite(OrgInvite orgInvite, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
                 var tran = tx ?? Transaction;
 
                 var parameters = new { AppUserID = userId, orgInvite.OrgID, orgInvite.ID };
-                var sql = @"INSERT UserOrgs (AppUserID, OrgID)
+                var sql = @"INSERT INTO userorgs (appuserid, orgid)
                             VALUES (@AppUserID, @OrgID);
 
-                            DELETE FROM OrgInvites
-                            WHERE ID=@ID;";
+                            DELETE FROM orginvites
+                            WHERE id=@ID;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -202,14 +202,14 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteOrgInvite(OrgInvite orgInvite, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteOrgInvite(OrgInvite orgInvite, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
                 var tran = tx ?? Transaction;
 
                 var parameters = new { ID = orgInvite.ID };
-                var sql = @"DELETE FROM OrgInvites WHERE ID=@ID;";
+                var sql = @"DELETE FROM orginvites WHERE id=@ID;";
 
                 var command = new CommandDefinition(
                     sql,

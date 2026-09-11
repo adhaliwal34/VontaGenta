@@ -1,5 +1,5 @@
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Dapper;
 
 namespace VontaGenta.Data
@@ -20,24 +20,24 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, EntryDate = date, OrgId = orgId };
                 var sql = @"SELECT
-                        Revenues.*
-                        ,AspNetUsers.*
-                        ,Currencies.*
-                        ,Projects.*
-                        ,Clients.*
-                        ,Orgs.*
-                        FROM Revenues
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Revenues.AppUserID
-                        INNER JOIN Currencies ON Currencies.ID = Revenues.CurrencyID
-                        INNER JOIN Projects ON Projects.ID = Revenues.ProjectID
-                        INNER JOIN Clients ON Clients.ID = Projects.ClientID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
+                        revenues.*
+                        ,aspnetusers.*
+                        ,currencies.*
+                        ,projects.*
+                        ,clients.*
+                        ,orgs.*
+                        FROM revenues
+                        INNER JOIN aspnetusers ON aspnetusers.id = revenues.appuserid
+                        INNER JOIN currencies ON currencies.id = revenues.currencyid
+                        INNER JOIN projects ON projects.id = revenues.projectid
+                        INNER JOIN clients ON clients.id = projects.clientid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
                         WHERE
-                            Revenues.AppUserID = @AppUserId
-                            AND Revenues.EntryDate = @EntryDate
-                            AND UserOrgs.OrgID = @OrgId
-                            AND UserOrgs.AppUserID = @AppUserId;";
+                            revenues.appuserid = @AppUserId
+                            AND revenues.entrydate = @EntryDate
+                            AND userorgs.orgid = @OrgId
+                            AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -69,10 +69,10 @@ namespace VontaGenta.Data
 
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Revenues.*
-                        FROM Revenues
+                        revenues.*
+                        FROM revenues
                         WHERE
-                            Revenues.ID = @Id;";
+                            revenues.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -95,16 +95,16 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                        Revenues.*
-                        ,Projects.*
-                        ,AspNetUsers.*
-                        ,Currencies.*
-                        FROM Revenues
-                        INNER JOIN Projects ON Projects.ID = Revenues.ProjectID
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Revenues.AppUserID
-                        INNER JOIN Currencies ON Currencies.ID = Revenues.CurrencyID
+                        revenues.*
+                        ,projects.*
+                        ,aspnetusers.*
+                        ,currencies.*
+                        FROM revenues
+                        INNER JOIN projects ON projects.id = revenues.projectid
+                        INNER JOIN aspnetusers ON aspnetusers.id = revenues.appuserid
+                        INNER JOIN currencies ON currencies.id = revenues.currencyid
                         WHERE
-                            Revenues.ID = @Id;";
+                            revenues.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -127,7 +127,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveRevenue(Revenue revenue, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveRevenue(Revenue revenue, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (revenue == null)
             {
@@ -139,7 +139,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.EntryDate, revenue.AppUserID, revenue.ProjectID };
-                var sql = @"INSERT Revenues (Description, Amount, CurrencyID, EntryDate, AppUserID, ProjectID)
+                var sql = @"INSERT INTO revenues (description, amount, currencyid, entrydate, appuserid, projectid)
                             SELECT @Description, @Amount, @CurrencyID, @EntryDate, @AppUserID, @ProjectID;";
 
                 var command = new CommandDefinition(
@@ -158,7 +158,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteRevenue(int id, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteRevenue(int id, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
 
             try
@@ -166,7 +166,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = id };
-                var sql = @"DELETE FROM Revenues WHERE Revenues.ID = @Id;";
+                var sql = @"DELETE FROM revenues WHERE revenues.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -184,7 +184,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateRevenue(Revenue revenue, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateRevenue(Revenue revenue, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (revenue == null)
             {
@@ -196,9 +196,9 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { revenue.ID, revenue.Description, revenue.Amount, revenue.CurrencyID, revenue.EntryDate, revenue.ProjectID };
-                var sql = @"UPDATE Revenues
-                            SET Description = @Description, Amount = @Amount, CurrencyID = @CurrencyID, EntryDate = @EntryDate, ProjectID = @ProjectID
-                            WHERE Revenues.ID = @Id;";
+                var sql = @"UPDATE revenues
+                            SET description = @Description, amount = @Amount, currencyid = @CurrencyID, entrydate = @EntryDate, projectid = @ProjectID
+                            WHERE revenues.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -225,11 +225,11 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, Id = id };
                 var sql = @"SELECT
-                        1
-                        FROM Revenues
+                        true
+                        FROM revenues
                         WHERE
-                            Revenues.AppUserID = @AppUserId
-                            AND Revenues.ID = @Id;";
+                            revenues.appuserid = @AppUserId
+                            AND revenues.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,

@@ -1,4 +1,4 @@
-using MySqlConnector;
+using Npgsql;
 using System.Data;
 
 namespace VontaGenta.Data
@@ -19,12 +19,12 @@ namespace VontaGenta.Data
         private readonly Lazy<ITimesheetsRepo> _lazyTimesheets;
         private readonly Lazy<IUserOrgsRepo> _lazyUserOrgs;
 
-        private MySqlConnection? _connection;
-        private MySqlTransaction? _transaction;
+        private NpgsqlConnection? _connection;
+        private NpgsqlTransaction? _transaction;
 
         // _connection set on instantiation of object
-        public MySqlConnection Connection => _connection ?? throw new Exception("Connection not found");
-        public MySqlTransaction? Transaction => _transaction;
+        public NpgsqlConnection Connection => _connection ?? throw new Exception("Connection not found");
+        public NpgsqlTransaction? Transaction => _transaction;
 
         public IClientsRepo Clients => _lazyClients.Value;
         public IProjectsRepo Projects => _lazyProjects.Value;
@@ -42,7 +42,7 @@ namespace VontaGenta.Data
             ILoggerFactory loggerFactory)
         {
             _connectionString = config["ConnectionStrings:ApplicationDbContext"] ?? throw new Exception("Connection string not found");
-            _connection = new MySqlConnection(_connectionString);
+            _connection = new NpgsqlConnection(_connectionString);
             _logger = loggerFactory.CreateLogger<UnitOfWork>();
 
             // Lazy instantiation — repo only created when .Value is first accessed

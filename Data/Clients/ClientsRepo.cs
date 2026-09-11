@@ -1,7 +1,7 @@
 using Dapper;
 using VontaGenta.AppEnums;
 using VontaGenta.Entities;
-using MySqlConnector;
+using Npgsql;
 using Newtonsoft.Json;
 
 namespace VontaGenta.Data
@@ -38,16 +38,16 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = orgId };
                 var sql = @"SELECT
-                        Clients.*
-                        ,AspNetUsers.*
-                        ,Orgs.*
-                        FROM Clients
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Clients.AppUserID
-                        INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                        INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                        WHERE UserOrgs.AppUserID = @AppUserId
-                            AND Orgs.ID = @OrgID
-                        ORDER BY Orgs.Name, Clients.Name;";
+                        clients.*
+                        ,aspnetusers.*
+                        ,orgs.*
+                        FROM clients
+                        INNER JOIN aspnetusers ON aspnetusers.id = clients.appuserid
+                        INNER JOIN orgs ON orgs.id = clients.orgid
+                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                        WHERE userorgs.appuserid = @AppUserId
+                            AND orgs.id = @OrgID
+                        ORDER BY orgs.name, clients.name;";
 
                 var command = new CommandDefinition(
                                     sql,
@@ -76,14 +76,14 @@ namespace VontaGenta.Data
             {
                 var parameters = new { OrgID = orgId };
                 var sql = @"SELECT
-                        Clients.*
-                        ,AspNetUsers.*
-                        ,Orgs.*
-                        FROM Clients
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Clients.AppUserID
-                        INNER JOIN Orgs ON Clients.OrgID = Orgs.ID
-                        WHERE Clients.OrgID = @OrgID
-                        ORDER BY Orgs.Name, Clients.Name;";
+                        clients.*
+                        ,aspnetusers.*
+                        ,orgs.*
+                        FROM clients
+                        INNER JOIN aspnetusers ON aspnetusers.id = clients.appuserid
+                        INNER JOIN orgs ON clients.orgid = orgs.id
+                        WHERE clients.orgid = @OrgID
+                        ORDER BY orgs.name, clients.name;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -112,9 +112,9 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                            Clients.*
-                            FROM Clients
-                            WHERE Clients.ID = @Id;";
+                            clients.*
+                            FROM clients
+                            WHERE clients.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -138,13 +138,13 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = id };
                 var sql = @"SELECT
-                            Clients.*
-                            ,Orgs.*
-                            ,AspNetUsers.*
-                            FROM Clients
-                            INNER JOIN Orgs ON Orgs.ID = Clients.OrgID
-                            INNER JOIN AspNetUsers ON AspNetUsers.ID = Clients.AppUserID
-                            WHERE Clients.ID = @Id;";
+                            clients.*
+                            ,orgs.*
+                            ,aspnetusers.*
+                            FROM clients
+                            INNER JOIN orgs ON orgs.id = clients.orgid
+                            INNER JOIN aspnetusers ON aspnetusers.id = clients.appuserid
+                            WHERE clients.id = @Id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -166,7 +166,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveClient(Client client, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (client == null)
             {
@@ -178,8 +178,8 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { client.Name, client.Description, client.AppUserID, client.OrgID };
-                var sql = @"INSERT Clients (Name, Description, AppUserID, OrgID)
-                                VALUES (@Name, @Description, @AppUserId, @OrgId); SELECT LAST_INSERT_ID();";
+                var sql = @"INSERT INTO clients (name, description, appuserid, orgid)
+                                VALUES (@Name, @Description, @AppUserId, @OrgId) RETURNING id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -198,14 +198,14 @@ namespace VontaGenta.Data
                     EntityName = EntityName,
                     EntityID = insertedId,
                     Action = AppActions.Create,
-                    Timestamp = DateTime.UtcNow,
+                    EntryTimestamp = DateTime.UtcNow,
                     AppUserID = userId,
                     Json = JsonConvert.SerializeObject(client)
                 };
 
-                var parameters2 = new { dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.Timestamp, dataLog.AppUserID, dataLog.Json };
-                var sql2 = @"INSERT DataLogs (EntityName, EntityID, Action, Timestamp, AppUserID, Json)
-                                VALUES (@EntityName, @EntityID, @Action, @Timestamp, @AppUserID, @Json);";
+                var parameters2 = new { dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var sql2 = @"INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
+                                VALUES (@EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json);";
 
                 var command2 = new CommandDefinition(
                     sql2,
@@ -225,7 +225,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateClient(Client client, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (client == null)
             {
@@ -241,18 +241,18 @@ namespace VontaGenta.Data
                     EntityName = EntityName,
                     EntityID = client.ID,
                     Action = AppActions.Edit,
-                    Timestamp = DateTime.UtcNow,
+                    EntryTimestamp = DateTime.UtcNow,
                     AppUserID = userId,
                     Json = JsonConvert.SerializeObject(client)
                 };
 
-                var parameters = new { client.ID, client.Name, client.Description, client.OrgID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.Timestamp, dataLog.AppUserID, dataLog.Json };
-                var sql = @"UPDATE Clients
-                            SET Name = @Name, Description = @Description, OrgID = @OrgID
-                            WHERE Clients.ID = @ID;
+                var parameters = new { client.ID, client.Name, client.Description, client.OrgID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var sql = @"UPDATE clients
+                            SET name = @Name, description = @Description, orgid = @OrgID
+                            WHERE clients.id = @ID;
 
-                            INSERT DataLogs (EntityName, EntityID, Action, Timestamp, AppUserID, Json)
-                            VALUES (@EntityName, @EntityID, @Action, @Timestamp, @AppUserID, @Json);";
+                            INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
+                            VALUES (@EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json);";
 
                 var command = new CommandDefinition(
                     sql,
@@ -272,7 +272,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteClient(Client client, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (client == null)
             {
@@ -288,16 +288,16 @@ namespace VontaGenta.Data
                     EntityName = EntityName,
                     EntityID = client.ID,
                     Action = AppActions.Delete,
-                    Timestamp = DateTime.UtcNow,
+                    EntryTimestamp = DateTime.UtcNow,
                     AppUserID = userId,
                     Json = JsonConvert.SerializeObject(client)
                 };
 
-                var parameters = new { client.ID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.Timestamp, dataLog.AppUserID, dataLog.Json };
-                var sql = @"DELETE FROM Clients WHERE Clients.ID = @ID;
+                var parameters = new { client.ID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var sql = @"DELETE FROM clients WHERE clients.id = @ID;
 
-                            INSERT DataLogs (EntityName, EntityID, Action, Timestamp, AppUserID, Json)
-                            VALUES (@EntityName, @EntityID, @Action, @Timestamp, @AppUserID, @Json);";
+                            INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
+                            VALUES (@EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json);";
 
                 var command = new CommandDefinition(
                     sql,
@@ -325,11 +325,11 @@ namespace VontaGenta.Data
             {
                 var parameters = new { ClientId = clientId, AppUserId = userId };
                 var sql = @"SELECT
-                                1
-                                FROM Clients
-                                INNER JOIN UserOrgs ON UserOrgs.OrgID = Clients.OrgID
-                                WHERE UserOrgs.AppUserID = @AppUserId
-								    AND Clients.ID = @ClientId;";
+                                true
+                                FROM clients
+                                INNER JOIN userorgs ON userorgs.orgid = clients.orgid
+                                WHERE userorgs.appuserid = @AppUserId
+								    AND clients.id = @ClientId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -352,10 +352,10 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId, OrgId = client.OrgID };
                 var sql = @"SELECT
-                                1
-                                FROM UserOrgs
-                                WHERE UserOrgs.AppUserID = @AppUserId
-                                    AND UserOrgs.OrgID = @OrgId;";
+                                true
+                                FROM userorgs
+                                WHERE userorgs.appuserid = @AppUserId
+                                    AND userorgs.orgid = @OrgId;";
 
                 var command = new CommandDefinition(
                     sql,

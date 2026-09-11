@@ -9,7 +9,7 @@ namespace VontaGenta.Helpers
 
             var sql = new StringBuilder();
 
-            sql.Append($"INSERT {table} (");
+            sql.Append($"INSERT INTO {table} (");
             for (int i = 0; i < colNames.Count; i++ )
             {
                 sql.Append($"{colNames[i]}");

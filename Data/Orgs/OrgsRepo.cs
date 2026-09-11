@@ -1,6 +1,6 @@
 using VontaGenta.Entities;
 using Dapper;
-using MySqlConnector;
+using Npgsql;
 
 namespace VontaGenta.Data
 {
@@ -20,12 +20,12 @@ namespace VontaGenta.Data
             {
                 var parameters = new { AppUserId = userId };
                 var sql = @"SELECT
-                        Orgs.*
-                        ,AspNetUsers.*
-                        FROM UserOrgs
-                        INNER JOIN Orgs ON Orgs.ID = UserOrgs.OrgID
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Orgs.AppUserID
-                        WHERE UserOrgs.AppUserID = @AppUserId;";
+                        orgs.*
+                        ,aspnetusers.*
+                        FROM userorgs
+                        INNER JOIN orgs ON orgs.id = userorgs.orgid
+                        INNER JOIN aspnetusers ON aspnetusers.id = orgs.appuserid
+                        WHERE userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -53,12 +53,12 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = orgId, AppUserId = userId };
                 var sql = @"SELECT
-                        Orgs.*
-                        FROM UserOrgs
-                        INNER JOIN Orgs ON Orgs.ID = UserOrgs.OrgID
+                        orgs.*
+                        FROM userorgs
+                        INNER JOIN orgs ON orgs.id = userorgs.orgid
                         WHERE
-                        Orgs.ID = @Id
-                        AND UserOrgs.AppUserID = @AppUserId;";
+                        orgs.id = @Id
+                        AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -82,14 +82,14 @@ namespace VontaGenta.Data
             {
                 var parameters = new { Id = orgId, AppUserId = userId };
                 var sql = @"SELECT
-                        Orgs.*
-                        ,AspNetUsers.*
-                        FROM UserOrgs
-                        INNER JOIN Orgs ON Orgs.ID = UserOrgs.OrgID
-                        INNER JOIN AspNetUsers ON AspNetUsers.ID = Orgs.AppUserID
+                        orgs.*
+                        ,aspnetusers.*
+                        FROM userorgs
+                        INNER JOIN orgs ON orgs.id = userorgs.orgid
+                        INNER JOIN aspnetusers ON aspnetusers.id = orgs.appuserid
                         WHERE
-                        Orgs.ID = @Id
-                        AND UserOrgs.AppUserID = @AppUserId;";
+                        orgs.id = @Id
+                        AND userorgs.appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -110,7 +110,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> SaveOrg(Org org, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> SaveOrg(Org org, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (org == null)
             {
@@ -123,8 +123,8 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { org.Name, org.Description, AppUserId = org.AppUserID };
-                var sql = @"INSERT Orgs (Name, Description, AppUserID)
-                            VALUES (@Name, @Description, @AppUserID); SELECT LAST_INSERT_ID();";
+                var sql = @"INSERT INTO orgs (name, description, appuserid)
+                            VALUES (@Name, @Description, @AppUserID) RETURNING id;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -136,7 +136,7 @@ namespace VontaGenta.Data
                 var orgID = await Connection.QuerySingleAsync<int>(command);
 
                 var parameters2 = new { OrgID = orgID, org.AppUserID };
-                var sql2 = @"INSERT UserOrgs (AppUserID, OrgID)
+                var sql2 = @"INSERT INTO userorgs (appuserid, orgid)
                             VALUES (@AppUserID, @OrgID);";
 
                 command = new CommandDefinition(
@@ -157,7 +157,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> UpdateOrg(Org org, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> UpdateOrg(Org org, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (org == null)
             {
@@ -169,7 +169,7 @@ namespace VontaGenta.Data
                 var tran = tx ?? Transaction;
 
                 var parameters = new { Id = org.ID, org.Name, org.Description, AppUserId = userId };
-                var sql = "UPDATE Orgs SET Name = @Name, Description = @Description WHERE ID = @Id AND AppUserID = @AppUserId;";
+                var sql = "UPDATE orgs SET name = @Name, description = @Description WHERE id = @Id AND appuserid = @AppUserId;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -187,7 +187,7 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteOrg(Org org, string userId, CancellationToken ct, MySqlTransaction? tx = null)
+        public async Task<int> DeleteOrg(Org org, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             if (org == null)
             {
@@ -200,7 +200,7 @@ namespace VontaGenta.Data
 
                 // Delete all members of the Org.
                 var parameters1 = new { Id = org.ID };
-                var sql1 = "DELETE FROM UserOrgs WHERE OrgID = @Id;";
+                var sql1 = "DELETE FROM userorgs WHERE orgid = @Id;";
 
                 var command = new CommandDefinition(
                     sql1,
@@ -212,7 +212,7 @@ namespace VontaGenta.Data
                 await Connection.ExecuteAsync(command);
 
                 var parameters2 = new { Id = org.ID };
-                var sql2 = "DELETE FROM Orgs WHERE ID = @Id;";
+                var sql2 = "DELETE FROM orgs WHERE id = @Id;";
 
                 command = new CommandDefinition(
                     sql2,
