@@ -11,7 +11,11 @@ ASP.NET Core MVC app on .NET 8 with PostgreSQL.
 - Tests (xUnit, in the sibling repo `../VontaGentaTest`, which references this project): `dotnet test ../VontaGentaTest/VontaGentaTest.csproj`
 - Single test: `dotnet test ../VontaGentaTest/VontaGentaTest.csproj --filter "FullyQualifiedName~DapperHelperTests"`
 
-No linter is configured. The database schema is kept in [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql).
+- Format check: `dotnet format --verify-no-changes VontaGenta.sln` (run `dotnet format VontaGenta.sln` to fix). Keep it passing.
+
+Linting uses the Roslyn analyzers, configured by `AnalysisLevel` and `EnforceCodeStyleInBuild` in [VontaGenta.csproj](VontaGenta.csproj) and by [.editorconfig](.editorconfig). Analyzer findings show up as warnings in `dotnet build`, so check it for new ones. `Migrations` and `Areas/Identity` are marked as generated code and skipped. CA1848 (LoggerMessage delegates) is turned off on purpose. Line endings are LF (`.gitattributes` and `.editorconfig`), apart from `.sln`, `.bat` and `.cmd`, which are CRLF.
+
+The database schema is kept in [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql).
 
 ## Architecture
 
