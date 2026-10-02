@@ -80,9 +80,9 @@ namespace VontaGenta.Controllers
                 _mapper.Map(timesheet, item);
 
                 // Coping the duration from the DTO to the view model if an entry exists.
-                if (dto.TimesheetDuration.ContainsKey(timesheet.ID))
+                if (dto.TimesheetDuration.TryGetValue(timesheet.ID, out var duration))
                 {
-                    item.Duration = dto.TimesheetDuration[timesheet.ID];
+                    item.Duration = duration;
                 }
 
                 vm.Timesheets.Add(item);

@@ -68,7 +68,7 @@ namespace VontaGenta.Services
                 }
             }
 
-            if (orgInvites.Any())
+            if (orgInvites.Count > 0)
             {
                 try
                 {

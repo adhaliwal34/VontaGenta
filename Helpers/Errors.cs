@@ -7,9 +7,9 @@ namespace VontaGenta.Models
 
         public void AddError(string property, string errorMessage)
         {
-            if (ErrorList.ContainsKey(property))
+            if (ErrorList.TryGetValue(property, out var existing))
             {
-                ErrorList[property] = ErrorList[property] + ". " + errorMessage;
+                ErrorList[property] = existing + ". " + errorMessage;
             }
             else
             {
@@ -28,7 +28,7 @@ namespace VontaGenta.Models
 
         public bool Any()
         {
-            return ErrorList.Any();
+            return ErrorList.Count > 0;
         }
 
         public Errors()

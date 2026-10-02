@@ -56,14 +56,7 @@ namespace VontaGenta.Services
         {
             var projectIdName = $"{timesheet.Project?.ID}:{timesheet.Project?.Name}";
 
-            if (totalTime.ContainsKey(projectIdName))
-            {
-                totalTime[projectIdName] += taskDuration;
-            }
-            else
-            {
-                totalTime.Add(projectIdName, taskDuration);
-            }
+            totalTime[projectIdName] = totalTime.GetValueOrDefault(projectIdName) + taskDuration;
         }
 
         /*      public TaskServiceResponse EndPreviousTask(AppUser user)
