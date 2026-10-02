@@ -22,11 +22,11 @@ namespace VontaGenta.Services
 
             try
             {
-                var from = _config["Emails:FromEmail"] ?? throw new ArgumentNullException("From email is null");
+                var from = _config["Emails:FromEmail"] ?? throw new InvalidOperationException("From email is null");
 
                 MailMessage message = new MailMessage(from, toEmail, subject, body);
 
-                var port = _config["AWS:SES_SMTP_PORT"] ?? throw new ArgumentNullException("Port is null");
+                var port = _config["AWS:SES_SMTP_PORT"] ?? throw new InvalidOperationException("Port is null");
 
                 // https://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-connect.html
                 int aws_ses_smtp_port = int.Parse(port, CultureInfo.InvariantCulture);
