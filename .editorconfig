@@ -2,6 +2,7 @@ root = true
 
 [*]
 charset = utf-8
+end_of_line = lf
 indent_style = space
 indent_size = 4
 insert_final_newline = true
@@ -44,3 +45,6 @@ dotnet_diagnostic.CA1848.severity = none
 
 [{Migrations,Areas/Identity}/**.cs]
 generated_code = true
+
+[*.{sln,bat,cmd}]
+end_of_line = crlf
