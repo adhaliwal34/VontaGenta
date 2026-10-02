@@ -17,7 +17,7 @@ namespace VontaGenta.Models
             }
         }
 
-        public IEnumerable<KeyValuePair<string,string>> GetErrors()
+        public IEnumerable<KeyValuePair<string, string>> GetErrors()
         {
             var errors = new List<KeyValuePair<string, string>>();
 

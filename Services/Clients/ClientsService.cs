@@ -118,7 +118,7 @@ namespace VontaGenta.Services
         {
             var dto = new UpdateClientDTO();
 
-            if(!await _unitOfWork.Clients.AllowGetClient(client.ID, userId, ct))
+            if (!await _unitOfWork.Clients.AllowGetClient(client.ID, userId, ct))
             {
                 dto.Error = "Error: Not found";
                 return dto;

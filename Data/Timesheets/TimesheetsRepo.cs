@@ -1,6 +1,6 @@
-using VontaGenta.Entities;
-using Npgsql;
 using Dapper;
+using Npgsql;
+using VontaGenta.Entities;
 
 namespace VontaGenta.Data
 {

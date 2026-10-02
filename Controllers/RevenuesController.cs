@@ -1,3 +1,4 @@
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -5,7 +6,6 @@ using VontaGenta.Data;
 using VontaGenta.Entities;
 using VontaGenta.Models;
 using VontaGenta.Services;
-using System.Text;
 
 namespace VontaGenta.Controllers
 {
@@ -117,7 +117,8 @@ namespace VontaGenta.Controllers
 
             var dto = _revenuesService.GetNewRevenue(user.Id, user.TimeZone.ZoneId, vm.EntryDate);
 
-            if (!dto.IsSuccess) {
+            if (!dto.IsSuccess)
+            {
                 SetError(dto.Error);
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }

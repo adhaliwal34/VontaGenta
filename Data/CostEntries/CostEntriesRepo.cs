@@ -1,6 +1,6 @@
-using VontaGenta.Entities;
-using Npgsql;
 using Dapper;
+using Npgsql;
+using VontaGenta.Entities;
 
 namespace VontaGenta.Data
 {
@@ -52,7 +52,7 @@ namespace VontaGenta.Data
             try
             {
 
-                var parameters = new { AppUserId = userId, OrgId = orgId, Year = year, Month = month, Limit = itemsPerPage, Offset = (page-1) * itemsPerPage };
+                var parameters = new { AppUserId = userId, OrgId = orgId, Year = year, Month = month, Limit = itemsPerPage, Offset = (page - 1) * itemsPerPage };
                 var sql = @"SELECT
                         costentries.*
                         ,aspnetusers.*

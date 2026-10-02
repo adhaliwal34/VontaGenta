@@ -13,7 +13,7 @@ namespace VontaGenta.Models
         public string CurrencySymbol { get; set; }
         [Display(Name = "Date")]
         public DateTime EntryDate { get; set; }
-        
+
         [Display(Name = "Project")]
         public string ProjectName { get; set; }
     }

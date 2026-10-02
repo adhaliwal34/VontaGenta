@@ -1,7 +1,7 @@
 #nullable disable
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Entities;
-using System.ComponentModel.DataAnnotations;
 namespace VontaGenta.Models
 {
     public class ProjectCreateViewModel : IHasClientsSelectLists

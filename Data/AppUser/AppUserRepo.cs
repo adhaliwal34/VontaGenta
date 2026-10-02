@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Identity;
-using VontaGenta.Entities;
-using Npgsql;
 using System.Security.Claims;
 using Dapper;
+using Microsoft.AspNetCore.Identity;
+using Npgsql;
+using VontaGenta.Entities;
 using VontaGenta.Helpers;
 
 namespace VontaGenta.Data

@@ -1,3 +1,4 @@
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ using VontaGenta.Entities;
 using VontaGenta.Helpers;
 using VontaGenta.Models;
 using VontaGenta.Services;
-using System.Text;
 
 namespace VontaGenta.Controllers
 {

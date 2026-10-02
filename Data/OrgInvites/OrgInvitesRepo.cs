@@ -1,6 +1,6 @@
-using VontaGenta.Entities;
 using Dapper;
 using Npgsql;
+using VontaGenta.Entities;
 using VontaGenta.Helpers;
 
 namespace VontaGenta.Data
@@ -11,7 +11,7 @@ namespace VontaGenta.Data
         public OrgInvitesRepo(IUnitOfWork uow, ILogger<OrgInvitesRepo> logger)
         : base(uow, logger)
         {
-           _logger.LogInformation("OrgInvitesRepo instantiated");
+            _logger.LogInformation("OrgInvitesRepo instantiated");
         }
 
         // Get all invites to a org user is creator of.

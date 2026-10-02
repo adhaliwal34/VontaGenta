@@ -1,6 +1,6 @@
 #nullable disable
-using VontaGenta.Models;
 using Newtonsoft.Json;
+using VontaGenta.Models;
 
 namespace VontaGenta.Entities
 {

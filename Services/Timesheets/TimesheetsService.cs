@@ -330,7 +330,7 @@ namespace VontaGenta.Services
                     return dto;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error

@@ -1,5 +1,5 @@
-using VontaGenta.Entities;
 using Dapper;
+using VontaGenta.Entities;
 
 namespace VontaGenta.Data
 {
@@ -7,7 +7,7 @@ namespace VontaGenta.Data
     {
 
         public CurrenciesRepo(IUnitOfWork uow, ILogger<CurrenciesRepo> logger)
-        : base (uow, logger)
+        : base(uow, logger)
         {
             _logger.LogInformation("CurrenciesRepo instantiated");
         }

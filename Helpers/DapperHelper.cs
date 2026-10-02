@@ -10,10 +10,10 @@ namespace VontaGenta.Helpers
             var sql = new StringBuilder();
 
             sql.Append($"INSERT INTO {table} (");
-            for (int i = 0; i < colNames.Count; i++ )
+            for (int i = 0; i < colNames.Count; i++)
             {
                 sql.Append($"{colNames[i]}");
-                if (i < colNames.Count -1)
+                if (i < colNames.Count - 1)
                 {
                     sql.Append(',');
                 }
@@ -21,12 +21,12 @@ namespace VontaGenta.Helpers
             sql.Append(") VALUES ");
 
             for (int i = 0; i < rows; i++)
-            { 
+            {
                 sql.Append('(');
                 for (int j = 0; j < colNames.Count; j++)
                 {
                     sql.AppendFormat($"@{colNames[j]}{i}");
-                    
+
                     if (j < colNames.Count - 1)
                     {
                         sql.Append(',');

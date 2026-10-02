@@ -1,5 +1,5 @@
-using VontaGenta.Helpers;
 using Npgsql;
+using VontaGenta.Helpers;
 
 namespace VontaGenta.Data
 {

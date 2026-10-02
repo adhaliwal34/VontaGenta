@@ -21,7 +21,8 @@ namespace VontaGenta.Services
 
     public class SetActiveOrgDTO : RequestStatus { }
 
-    public class GetActiveOrgDTO : RequestStatus {
+    public class GetActiveOrgDTO : RequestStatus
+    {
         public Org Org { get; set; }
     }
 
@@ -34,7 +35,7 @@ namespace VontaGenta.Services
     public class LeaveOrgDTO : RequestStatus { }
 
     public class IsOrgMemberDTO : RequestStatus
-    { 
+    {
         public bool IsOrgMember { get; set; }
     }
 

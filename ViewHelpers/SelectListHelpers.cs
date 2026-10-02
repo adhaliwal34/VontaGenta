@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using EnumsNET;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace VontaGenta.ViewHelpers
 {

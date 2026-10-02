@@ -1,6 +1,6 @@
-using VontaGenta.Entities;
 using Dapper;
 using Npgsql;
+using VontaGenta.Entities;
 
 namespace VontaGenta.Data
 {
@@ -10,7 +10,7 @@ namespace VontaGenta.Data
         public OrgsRepo(IUnitOfWork uow, ILogger<OrgsRepo> logger)
         : base(uow, logger)
         {
-           _logger.LogInformation("OrgsRepo instantiated");
+            _logger.LogInformation("OrgsRepo instantiated");
         }
 
         // Get all orgs user is a member of.

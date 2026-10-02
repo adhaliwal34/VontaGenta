@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using VontaGenta.Data;
 using VontaGenta.DependencyInjection;
 using VontaGenta.Entities;
-using Serilog;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

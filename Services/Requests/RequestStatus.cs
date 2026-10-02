@@ -11,7 +11,8 @@ namespace VontaGenta.Services
         // For detailed validation errors. Always set Error when setting ErrorList.
         public IEnumerable<KeyValuePair<string, string>> ErrorList { get; set; }
 
-        public RequestStatus() {
+        public RequestStatus()
+        {
             ErrorList = new List<KeyValuePair<string, string>>();
         }
     }

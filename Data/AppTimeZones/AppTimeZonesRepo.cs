@@ -6,7 +6,7 @@ namespace VontaGenta.Data
     public class AppTimeZonesRepo : RepoBase, IAppTimeZonesRepo
     {
         public AppTimeZonesRepo(IUnitOfWork uow, ILogger<AppTimeZonesRepo> logger)
-            :base(uow, logger)
+            : base(uow, logger)
         {
             _logger.LogInformation("AppTimeZonesRepo instantiated");
         }

@@ -14,7 +14,7 @@ namespace VontaGenta.Models
         public bool ShowEditLink { get; set; }
 
         public OrgDetailsViewModel()
-        { 
+        {
             OrgMembers = [];
         }
     }

@@ -1,7 +1,7 @@
 #nullable disable
 
-using VontaGenta.Entities;
 using System.ComponentModel.DataAnnotations;
+using VontaGenta.Entities;
 
 namespace VontaGenta.Models
 {

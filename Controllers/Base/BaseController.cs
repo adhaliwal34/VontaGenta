@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using VontaGenta.Entities;
 using VontaGenta.Models;
 using VontaGenta.Services;
 using VontaGenta.ViewHelpers;
-using VontaGenta.Entities;
 
 namespace VontaGenta.Controllers
 {
@@ -60,7 +60,8 @@ namespace VontaGenta.Controllers
             {
                 sysVerFloat = float.Parse(sysVer);
             }
-            catch {
+            catch
+            {
                 // TODO log error
             }
 

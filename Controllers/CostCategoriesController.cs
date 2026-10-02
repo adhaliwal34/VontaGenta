@@ -1,8 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
-using AutoMapper;
 using VontaGenta.Models;
 using VontaGenta.Services;
 

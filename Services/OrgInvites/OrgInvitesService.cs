@@ -1,6 +1,6 @@
 using System.Data;
-using VontaGenta.Data;
 using Microsoft.AspNetCore.Identity;
+using VontaGenta.Data;
 using VontaGenta.Entities;
 
 namespace VontaGenta.Services
@@ -88,7 +88,7 @@ namespace VontaGenta.Services
                         return dto;
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     await _unitOfWork.RollbackAsync(ct);
                     //TODO log error
@@ -168,7 +168,7 @@ namespace VontaGenta.Services
                     return dto;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
@@ -209,7 +209,7 @@ namespace VontaGenta.Services
                     return dto;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error

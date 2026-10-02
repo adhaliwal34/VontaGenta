@@ -7,5 +7,5 @@ namespace VontaGenta.Entities
         public int ID { get; set; }
         public string ZoneId { get; set; }
         public string FriendlyName { get; set; }
-    } 
+    }
 }

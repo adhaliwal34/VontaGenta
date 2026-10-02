@@ -1,8 +1,8 @@
 using Dapper;
+using Newtonsoft.Json;
+using Npgsql;
 using VontaGenta.AppEnums;
 using VontaGenta.Entities;
-using Npgsql;
-using Newtonsoft.Json;
 
 namespace VontaGenta.Data
 {

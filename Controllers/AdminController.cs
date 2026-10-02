@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VontaGenta.Services;
 using VontaGenta.Data;
+using VontaGenta.Services;
 
 namespace VontaGenta.Controllers
 {

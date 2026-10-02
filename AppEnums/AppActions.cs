@@ -7,6 +7,6 @@ namespace VontaGenta.AppEnums
         Edit = 2,
         View = 4,
         Delete = 8,
-        
+
     }
 }
