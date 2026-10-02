@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <UserSecretsId>aspnet-VontaGenta-FF9CB5D7-A61D-4978-A8D8-830EE238946F</UserSecretsId>
   </PropertyGroup>
 

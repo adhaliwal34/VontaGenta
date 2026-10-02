@@ -1,0 +1,46 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,csproj,props,targets}]
+indent_size = 2
+
+[*.cs]
+# Naming: private fields are _camelCase
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private, protected
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
+# Interfaces start with I
+dotnet_naming_rule.interfaces_i_prefix.symbols = interfaces
+dotnet_naming_rule.interfaces_i_prefix.style = i_prefix
+dotnet_naming_rule.interfaces_i_prefix.severity = suggestion
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.i_prefix.required_prefix = I
+dotnet_naming_style.i_prefix.capitalization = pascal_case
+
+# Style
+csharp_style_namespace_declarations = block_scoped:suggestion
+csharp_new_line_before_open_brace = all
+dotnet_sort_system_directives_first = true
+dotnet_style_qualification_for_field = false:suggestion
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+# Start as warnings-only; generated/scaffolded code is excluded below
+dotnet_analyzer_diagnostic.severity = suggestion
+
+# LoggerMessage delegates are a hot-path optimisation; not worth the boilerplate for error logging
+dotnet_diagnostic.CA1848.severity = none
+
+[{Migrations,Areas/Identity}/**.cs]
+generated_code = true
