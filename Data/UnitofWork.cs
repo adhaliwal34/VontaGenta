@@ -23,7 +23,7 @@ namespace VontaGenta.Data
         private NpgsqlTransaction? _transaction;
 
         // _connection set on instantiation of object
-        public NpgsqlConnection Connection => _connection ?? throw new Exception("Connection not found");
+        public NpgsqlConnection Connection => _connection ?? throw new InvalidOperationException("Connection not found");
         public NpgsqlTransaction? Transaction => _transaction;
 
         public IClientsRepo Clients => _lazyClients.Value;
@@ -41,7 +41,7 @@ namespace VontaGenta.Data
         public UnitOfWork(IConfiguration config,
             ILoggerFactory loggerFactory)
         {
-            _connectionString = config["ConnectionStrings:ApplicationDbContext"] ?? throw new Exception("Connection string not found");
+            _connectionString = config["ConnectionStrings:ApplicationDbContext"] ?? throw new InvalidOperationException("Connection string not found");
             _connection = new NpgsqlConnection(_connectionString);
             _logger = loggerFactory.CreateLogger<UnitOfWork>();
 
@@ -88,7 +88,7 @@ namespace VontaGenta.Data
         {
             if (_connection == null)
             {
-                throw new Exception("Connection not found");
+                throw new InvalidOperationException("Connection not found");
             }
 
             if (_connection.State != ConnectionState.Open)

@@ -40,7 +40,7 @@ namespace VontaGenta.Controllers
         // GET: CostEntries
         public async Task<IActionResult> Index(CostEntryIndexViewModel vm, CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -89,7 +89,7 @@ namespace VontaGenta.Controllers
 
             vm.MonthsSelectList = new SelectList(new Months().List, "ID", "ShortName", vm.Month);
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -137,7 +137,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -178,7 +178,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -203,7 +203,7 @@ namespace VontaGenta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EntryDate,Name,Description,CategoryID,Amount,CurrencyID,ProjectID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -269,7 +269,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -312,7 +312,7 @@ namespace VontaGenta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([Bind("ID,EntryDate,Name,Description,CategoryID,ProjectID,Amount,CurrencyID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -365,7 +365,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -400,7 +400,7 @@ namespace VontaGenta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id, int? year, int? month, int? page, int? itemsPerPage, CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 

@@ -31,7 +31,7 @@ namespace VontaGenta.Controllers
             // This action is often redirected to with status messages and should maintain that data.
             var existingStatus = GetStatus();
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -77,7 +77,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -104,7 +104,7 @@ namespace VontaGenta.Controllers
         // GET: CostCategories/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -123,7 +123,7 @@ namespace VontaGenta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description")] CostCategoryCreateViewModel vm, CancellationToken ct)
         {
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -162,7 +162,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -196,7 +196,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -234,7 +234,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
@@ -268,7 +268,7 @@ namespace VontaGenta.Controllers
                 return NotFound();
             }
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 

@@ -39,7 +39,7 @@ namespace VontaGenta.Services
             catch (Exception ex)
             {
                 while (ex.InnerException != null) { ex = ex.InnerException; }
-                _logger.LogError(ex.Message);
+                _logger.LogError("{Message}", ex.Message);
                 return false;
             }
 

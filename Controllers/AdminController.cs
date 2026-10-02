@@ -21,7 +21,7 @@ namespace VontaGenta.Controllers
         public async Task<IActionResult> Index(CancellationToken ct)
         {
 
-            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new Exception("Logged in user not found");
+            var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
 
