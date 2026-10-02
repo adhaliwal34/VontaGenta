@@ -1,0 +1,39 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+ASP.NET Core MVC app on .NET 8 with PostgreSQL.
+
+- Build: `dotnet build VontaGenta.sln`
+- Run: `dotnet run --project VontaGenta.csproj`
+- Tests (xUnit, in the sibling repo `../VontaGentaTest`, which references this project): `dotnet test ../VontaGentaTest/VontaGentaTest.csproj`
+- Single test: `dotnet test ../VontaGentaTest/VontaGentaTest.csproj --filter "FullyQualifiedName~DapperHelperTests"`
+
+No linter is configured. The database schema is kept in [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql).
+
+## Architecture
+
+Layering: `Controllers` → `Services` → `Data` (repos) → PostgreSQL. Each feature (Clients, Projects, CostEntries, Revenues, Timesheets, Orgs, ...) has a file set in each layer, plus `Models/<Feature>` (view models), `AutoMapping/<Feature>Mapper.cs` and `DependencyInjection/<Feature>ServicesExtensions.cs`. A new feature must be registered with an `Add<Feature>Services()` call in [Program.cs](Program.cs).
+
+### Data access: Dapper, not EF, for app data
+- Entity Framework (`ApplicationDbContext`) is used only for ASP.NET Identity (`AppUser`, roles) and Identity UI under `Areas/Identity`.
+- All domain queries are raw SQL through Dapper over an `NpgsqlConnection` held by `UnitOfWork` ([Data/UnitofWork.cs](Data/UnitofWork.cs)). SQL uses lowercase Postgres table and column names (`clients`, `aspnetusers`, `userorgs`).
+- Repos derive from `RepoBase`, which exposes `Connection` and `Transaction` from the unit of work. Services reach repos only through `IUnitOfWork` (for example `_unitOfWork.Clients`). Repos are created lazily inside `UnitOfWork`. Adding a repo means editing `IUnitOfWork`, `UnitOfWork` (field, property and lazy initialiser) and the feature's DI extension.
+- Services open transactions explicitly (`BeginTransactionAsync` / `CommitAsync` / `RollbackAsync`) for writes.
+- `Helpers/DapperHelper.cs` builds bulk-insert SQL.
+- `Program.cs` sets `Npgsql.EnableLegacyTimestampBehavior`. Keep it when touching date/time code.
+
+### Authorization lives in the data layer
+Permission checks are hard-coded in SQL. Typically a service calls a repo `Allow*` method (for example `AllowGetClient`) that checks `userorgs` membership before fetching. Users see data only for orgs they belong to, and `BaseController.GetActiveOrgSetName` resolves the user's active org.
+
+### Services return DTOs, not exceptions
+Services return per-operation DTOs (`Services/<Feature>/*DTOs.cs`) with an `Error` string and an `IsSuccess` property. Controllers surface them through `BaseController.SetError` / `SetStatus` (TempData). Repos catch exceptions and use `ErrorHelpers.GetExceptionError`.
+
+### Other notes
+- AutoMapper 15 needs a license key at `Licenses:AutoMapper` in config, and startup throws without it.
+- Serilog writes to `logs/` and is configured in `appsettings.json`.
+- Select lists for views are built by `ViewHelpers/SelectListHelpers.cs` via the `IHas*SelectLists` interfaces in `Models/Interfaces`.
+- Registration is gated by the `RegistrationEnabled` setting, and hCaptcha and AWS SES email are wired in via the `Hcaptcha` and `Emails` services.
+- `appsettings.*` is gitignored and holds the local DB connection string, AWS SES credentials and the hCaptcha secret. A fresh clone has no config, so you must create it yourself. Keep secrets out of tracked files.
