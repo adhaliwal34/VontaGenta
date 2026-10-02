@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -458,7 +459,7 @@ namespace VontaGenta.Controllers
 
             if (!getProjectsDTO.IsSuccess)
             {
-                errors.AppendFormat("Error getting projects: {0}", getProjectsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting projects: {0}", getProjectsDTO.Error);
             }
             else
             {
@@ -469,7 +470,7 @@ namespace VontaGenta.Controllers
 
             if (!getCategoriesDTO.IsSuccess)
             {
-                errors.AppendFormat("Error getting categories: {0}", getProjectsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting categories: {0}", getProjectsDTO.Error);
             }
             else
             {
@@ -480,7 +481,7 @@ namespace VontaGenta.Controllers
 
             if (!getCurrenciesDTO.IsSuccess)
             {
-                errors.AppendFormat("Error getting currencies: {0}", getCurrenciesDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting currencies: {0}", getCurrenciesDTO.Error);
             }
             else
             {

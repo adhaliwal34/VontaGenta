@@ -1,3 +1,4 @@
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace VontaGenta.Helpers
@@ -12,13 +13,13 @@ namespace VontaGenta.Helpers
         public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
         {
             // Ignoring time portion
-            writer.WriteValue(value.ToString("yyyy-MM-dd"));
+            writer.WriteValue(value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         }
 
         public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             // Implement read logic if needed, or throw if read not supported
-            return DateTime.Parse(reader.Value?.ToString() ?? throw new JsonSerializationException("Unexpected null"));
+            return DateTime.Parse(reader.Value?.ToString() ?? throw new JsonSerializationException("Unexpected null"), CultureInfo.InvariantCulture);
         }
     }
 }

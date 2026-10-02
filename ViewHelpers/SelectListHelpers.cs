@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using EnumsNET;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Models;
@@ -81,7 +82,7 @@ namespace VontaGenta.ViewHelpers
                              .Select(m => new SelectListItem
                              {
                                  Text = m.Attributes.Get<DisplayAttribute>()?.Name ?? m.Name,
-                                 Value = ((int)m.Value).ToString()
+                                 Value = ((int)m.Value).ToString(CultureInfo.InvariantCulture)
                              })
                              .ToList());
 
@@ -122,7 +123,7 @@ namespace VontaGenta.ViewHelpers
                              .Select(m => new SelectListItem
                              {
                                  Text = m.Attributes.Get<DisplayAttribute>()?.Name ?? m.Name,
-                                 Value = ((int)m.Value).ToString()
+                                 Value = ((int)m.Value).ToString(CultureInfo.InvariantCulture)
                              })
                              .ToList());
 

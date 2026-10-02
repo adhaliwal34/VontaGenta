@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 
 namespace VontaGenta.Helpers
@@ -9,10 +10,10 @@ namespace VontaGenta.Helpers
 
             var sql = new StringBuilder();
 
-            sql.Append($"INSERT INTO {table} (");
+            sql.Append(CultureInfo.InvariantCulture, $"INSERT INTO {table} (");
             for (int i = 0; i < colNames.Count; i++)
             {
-                sql.Append($"{colNames[i]}");
+                sql.Append(CultureInfo.InvariantCulture, $"{colNames[i]}");
                 if (i < colNames.Count - 1)
                 {
                     sql.Append(',');
@@ -25,7 +26,7 @@ namespace VontaGenta.Helpers
                 sql.Append('(');
                 for (int j = 0; j < colNames.Count; j++)
                 {
-                    sql.AppendFormat($"@{colNames[j]}{i}");
+                    sql.Append(CultureInfo.InvariantCulture, $"@{colNames[j]}{i}");
 
                     if (j < colNames.Count - 1)
                     {

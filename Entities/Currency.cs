@@ -1,4 +1,5 @@
 #nullable disable
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace VontaGenta.Entities
@@ -11,6 +12,6 @@ namespace VontaGenta.Entities
         public string Symbol { get; set; }
 
         [JsonIgnore]
-        public string LongName { get { return string.Format("{0} - {1} - {2}", Name, Code, Symbol); } }
+        public string LongName { get { return string.Format(CultureInfo.InvariantCulture, "{0} - {1} - {2}", Name, Code, Symbol); } }
     }
 }

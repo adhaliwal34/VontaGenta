@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -327,7 +328,7 @@ namespace VontaGenta.Controllers
 
             if (!getClientsDTO.IsSuccess)
             {
-                errors.AppendFormat("Error getting clients: {0}", getClientsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting clients: {0}", getClientsDTO.Error);
             }
             else
             {

@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 using VontaGenta.Data;
 using VontaGenta.Entities;
 
@@ -44,7 +45,7 @@ namespace VontaGenta.Services
                     PopulateTotalTimePerProject(dto.TotalTimePerProject, timesheet, taskDuration.Value);
 
                     // TODO: document that the current implementation only displays hours and minutes up to a maximum of 23 hours and 59 minutes, days etc not supported.
-                    dto.TimesheetDuration.Add(timesheet.ID, taskDuration.Value.ToString(@"hh\:mm"));
+                    dto.TimesheetDuration.Add(timesheet.ID, taskDuration.Value.ToString(@"hh\:mm", CultureInfo.InvariantCulture));
                 }
             }
 

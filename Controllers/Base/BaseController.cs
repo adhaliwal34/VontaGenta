@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Entities;
 using VontaGenta.Models;
@@ -58,7 +59,7 @@ namespace VontaGenta.Controllers
 
             try
             {
-                sysVerFloat = float.Parse(sysVer);
+                sysVerFloat = float.Parse(sysVer, CultureInfo.InvariantCulture);
             }
             catch
             {

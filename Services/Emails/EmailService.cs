@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Mail;
 
@@ -28,7 +29,7 @@ namespace VontaGenta.Services
                 var port = _config["AWS:SES_SMTP_PORT"] ?? throw new ArgumentNullException("Port is null");
 
                 // https://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-connect.html
-                int aws_ses_smtp_port = int.Parse(port);
+                int aws_ses_smtp_port = int.Parse(port, CultureInfo.InvariantCulture);
                 var aws_ses_smtp_host = _config["AWS:SES_SMTP_ENDPOINT"];
                 using var objSmtpClient = new SmtpClient(aws_ses_smtp_host, aws_ses_smtp_port);
                 objSmtpClient.Credentials = new NetworkCredential(_config["AWS:SES_SMTP_USERNAME"], _config["AWS:SES_SMTP_PASSWORD"]);
