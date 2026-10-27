@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-ASP.NET Core MVC app on .NET 8 with PostgreSQL.
+ASP.NET Core MVC app on .NET 10 (SDK pinned in [global.json](global.json)) with PostgreSQL.
 
 - Build: `dotnet build VontaGenta.sln`
 - Run: `dotnet run --project VontaGenta.csproj`
