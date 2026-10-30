@@ -96,7 +96,7 @@ namespace VontaGenta.Controllers
         // GET: Clients/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var vm = new ClientCreateViewModel();
+            var vm = new ClientFormViewModel();
 
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -113,7 +113,7 @@ namespace VontaGenta.Controllers
         // POST: Clients/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] ClientCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(ClientFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -184,7 +184,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var vm = new ClientEditViewModel();
+            var vm = new ClientFormViewModel();
 
             _mapper.Map(dto.Client, vm);
 
@@ -194,13 +194,8 @@ namespace VontaGenta.Controllers
         // POST: Clients/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] ClientEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, ClientFormViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -217,7 +212,7 @@ namespace VontaGenta.Controllers
 
             try
             {
-                var editedClient = new Client();
+                var editedClient = new Client { ID = id };
 
                 _mapper.Map(vm, editedClient);
 

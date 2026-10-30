@@ -15,12 +15,9 @@ namespace VontaGenta.Mapping
                 .ForMember(d => d.OrgID, opt => opt.Ignore())
                 .ForMember(d => d.Org, opt => opt.Ignore());
 
-            CreateMap<ClientEditViewModel, Client>();
+            CreateMap<ClientFormViewModel, Client>();
 
-            CreateMap<ClientCreateViewModel, Client>();
-
-            CreateMap<Client, ClientEditViewModel>()
-                .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.User.Name));
+            CreateMap<Client, ClientFormViewModel>();
 
             CreateMap<Client, ClientDetailsViewModel>()
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.User.Name));
