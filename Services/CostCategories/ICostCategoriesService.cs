@@ -8,6 +8,6 @@ namespace VontaGenta.Services
         Task<GetCategoriesDTO> GetCategoriesForMemberOrg(string userId, int orgId, CancellationToken ct);
         Task<GetCategoryDTO> GetCategory(int id, string userId, CancellationToken ct);
         Task<SaveCategoryDTO> SaveCategory(Category category, string userId, CancellationToken ct);
-        Task<UpdateCategoryDTO> UpdateCategory(int id, Category category, string userId, CancellationToken ct);
+        Task<UpdateCategoryDTO> UpdateCategory(Category category, string userId, CancellationToken ct);
     }
 }

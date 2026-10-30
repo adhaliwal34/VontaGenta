@@ -213,7 +213,7 @@ namespace VontaGenta.Controllers
 
                 vm.MapTo(editedClient);
 
-                var dto = await _clientsService.UpdateClient(id, editedClient, user.Id, ct);
+                var dto = await _clientsService.UpdateClient(editedClient, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {

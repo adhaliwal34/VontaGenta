@@ -110,7 +110,7 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateProjectDTO> UpdateProject(int id, Project project, string userId, CancellationToken ct)
+        public async Task<UpdateProjectDTO> UpdateProject(Project project, string userId, CancellationToken ct)
         {
             var dto = new UpdateProjectDTO();
 
@@ -120,7 +120,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            var storedProject = await _unitOfWork.Projects.GetProject(id, ct);
+            var storedProject = await _unitOfWork.Projects.GetProject(project.ID, ct);
 
             if (storedProject == null)
             {

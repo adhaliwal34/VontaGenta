@@ -51,7 +51,6 @@ namespace VontaGenta.Mapping
         // Since ProjectID might change don't copy project reference.
         public static void MapTo(this CostEntry source, CostEntry dest)
         {
-            dest.ID = source.ID;
             dest.EntryDate = source.EntryDate;
             dest.Name = source.Name;
             dest.Description = source.Description;

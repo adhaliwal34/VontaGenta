@@ -70,7 +70,6 @@ namespace VontaGenta.Mapping
         // When editing an org keep the existing user. It should not be overwritten.
         public static void MapTo(this Org source, Org dest)
         {
-            dest.ID = source.ID;
             dest.Name = source.Name;
             dest.Description = source.Description;
         }

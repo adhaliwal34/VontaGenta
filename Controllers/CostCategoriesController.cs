@@ -208,7 +208,7 @@ namespace VontaGenta.Controllers
 
             editedCategory.AppUserID = user.Id;
 
-            var dto = await _costCategoriesService.UpdateCategory(id, editedCategory, user.Id, ct);
+            var dto = await _costCategoriesService.UpdateCategory(editedCategory, user.Id, ct);
 
             if (!dto.IsSuccess)
             {

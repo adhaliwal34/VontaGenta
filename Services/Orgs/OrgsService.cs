@@ -116,11 +116,11 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateOrgDTO> UpdateOrg(int id, Org org, string userId, CancellationToken ct)
+        public async Task<UpdateOrgDTO> UpdateOrg(Org org, string userId, CancellationToken ct)
         {
             var dto = new UpdateOrgDTO();
 
-            var storedOrg = await _unitOfWork.Orgs.GetOrg(id, userId, ct);
+            var storedOrg = await _unitOfWork.Orgs.GetOrg(org.ID, userId, ct);
 
             if (storedOrg == null)
             {

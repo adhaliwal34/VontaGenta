@@ -95,11 +95,11 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateCategoryDTO> UpdateCategory(int id, Category category, string userId, CancellationToken ct)
+        public async Task<UpdateCategoryDTO> UpdateCategory(Category category, string userId, CancellationToken ct)
         {
             var dto = new UpdateCategoryDTO();
 
-            var storedCategory = await _unitOfWork.CostCategories.GetCategory(id, ct);
+            var storedCategory = await _unitOfWork.CostCategories.GetCategory(category.ID, ct);
 
             if (storedCategory == null)
             {

@@ -35,7 +35,6 @@ namespace VontaGenta.Mapping
         // When editing a client keep the existing user and org. These should not be overwritten.
         public static void MapTo(this Client source, Client dest)
         {
-            dest.ID = source.ID;
             dest.Name = source.Name;
             dest.Description = source.Description;
         }

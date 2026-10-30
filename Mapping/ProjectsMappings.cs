@@ -44,7 +44,6 @@ namespace VontaGenta.Mapping
         // When editing a project keep the existing user. This should not be overwritten.
         public static void MapTo(this Project source, Project dest)
         {
-            dest.ID = source.ID;
             dest.Name = source.Name;
             dest.Description = source.Description;
             dest.StartDate = source.StartDate;

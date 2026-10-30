@@ -234,7 +234,7 @@ namespace VontaGenta.Controllers
 
                     vm.MapTo(editedProject);
 
-                    var dto = await _projectsService.UpdateProject(id, editedProject, user.Id, ct);
+                    var dto = await _projectsService.UpdateProject(editedProject, user.Id, ct);
 
                     if (!dto.IsSuccess)
                     {

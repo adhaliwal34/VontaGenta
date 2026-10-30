@@ -261,7 +261,7 @@ namespace VontaGenta.Controllers
 
                 vm.MapTo(editedOrg);
 
-                var dto = await _orgsService.UpdateOrg(id, editedOrg, user.Id, ct);
+                var dto = await _orgsService.UpdateOrg(editedOrg, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
