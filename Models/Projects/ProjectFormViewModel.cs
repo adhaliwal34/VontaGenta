@@ -4,13 +4,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Entities;
 namespace VontaGenta.Models
 {
-    public class ProjectCreateViewModel : IHasClientsSelectLists
+    public class ProjectFormViewModel : IHasClientsSelectLists
     {
-        public int ID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        [Display(Name = "Creator")]
-        public string UserName { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         [Required]
@@ -19,7 +16,7 @@ namespace VontaGenta.Models
         public SelectList Clients { get; set; }
         public List<Client> ClientList { get; set; }
 
-        public ProjectCreateViewModel()
+        public ProjectFormViewModel()
         {
             // TODO populate with user's timezone
             StartDate = DateTime.Today;

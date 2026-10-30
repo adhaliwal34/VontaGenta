@@ -13,9 +13,9 @@ namespace VontaGenta.Mapping
                 .ForMember(p => p.AppUserID, opt => opt.Ignore())
                 .ForMember(p => p.User, opt => opt.Ignore());
 
-            CreateMap<ProjectCreateViewModel, Project>();
+            CreateMap<ProjectFormViewModel, Project>();
 
-            CreateMap<Project, ProjectCreateViewModel>();
+            CreateMap<Project, ProjectFormViewModel>();
 
             CreateMap<Project, ProjectDetailsViewModel>()
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.User.Name))
