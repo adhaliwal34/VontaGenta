@@ -153,17 +153,21 @@ namespace VontaGenta.Controllers
         // GET: Orgs/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new OrgFormViewModel());
         }
 
         // POST: Orgs/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] Org org, CancellationToken ct)
+        public async Task<IActionResult> Create(OrgFormViewModel vm, CancellationToken ct)
         {
             if (ModelState.IsValid)
             {
                 var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
+
+                var org = new Org();
+
+                _mapper.Map(vm, org);
 
                 org.AppUserID = user.Id;
 
@@ -172,14 +176,14 @@ namespace VontaGenta.Controllers
                 if (!dto.IsSuccess)
                 {
                     SetError(dto.Error);
-                    return View(org);
+                    return View(vm);
                 }
 
                 SetStatus(dto.Status);
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(org);
+            return View(vm);
         }
 
         // GET: Orgs/Edit/5
@@ -199,7 +203,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _orgsService.GetOrg(id.Value, user.Id, ct);
+            var dto = await _orgsService.GetOrgAndRelatedFields(id.Value, user.Id, ct);
 
             if (!dto.IsSuccess)
             {
@@ -227,13 +231,8 @@ namespace VontaGenta.Controllers
         // POST: Orgs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] OrgEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, OrgEditViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -245,12 +244,23 @@ namespace VontaGenta.Controllers
 
             if (!ModelState.IsValid)
             {
+                // UserName is display only and is not posted back, so load it again for the page heading.
+                var orgDto = await _orgsService.GetOrgAndRelatedFields(id, user.Id, ct);
+
+                if (!orgDto.IsSuccess)
+                {
+                    SetError(orgDto.Error);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                vm.UserName = orgDto.Org.User.Name;
+
                 return View(vm);
             }
 
             try
             {
-                var editedOrg = new Org();
+                var editedOrg = new Org { ID = id };
 
                 _mapper.Map(vm, editedOrg);
 

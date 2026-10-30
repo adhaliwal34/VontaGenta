@@ -16,6 +16,8 @@ namespace VontaGenta.Mapping
 
             CreateMap<OrgEditViewModel, Org>();
 
+            CreateMap<OrgFormViewModel, Org>();
+
             CreateMap<Org, OrgEditViewModel>()
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.User.Name));
 
