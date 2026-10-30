@@ -171,7 +171,7 @@ namespace VontaGenta.Controllers
         // GET: CostEntries/Create
         public async Task<IActionResult> Create(int? year, int? month, int? page, int? itemsPerPage, CancellationToken ct)
         {
-            var vm = new CostEntryCreateViewModel
+            var vm = new CostEntryFormViewModel
             {
                 Year = year,
                 Month = month,
@@ -202,7 +202,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EntryDate,Name,Description,CategoryID,Amount,CurrencyID,ProjectID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(CostEntryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -287,7 +287,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
             }
 
-            var vm = new CostEntryCreateViewModel
+            var vm = new CostEntryFormViewModel
             {
                 Year = year,
                 Month = month,
@@ -311,7 +311,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,EntryDate,Name,Description,CategoryID,ProjectID,Amount,CurrencyID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, CostEntryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -337,7 +337,7 @@ namespace VontaGenta.Controllers
 
             try
             {
-                var editedCostEntry = new CostEntry();
+                var editedCostEntry = new CostEntry { ID = id };
 
                 _mapper.Map(vm, editedCostEntry);
 
@@ -424,7 +424,7 @@ namespace VontaGenta.Controllers
             return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
         }
 
-        private async Task<string?> PopulateCreateViewModelSelectLists(CostEntryCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelSelectLists(CostEntryFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var errors = await PopulateCreateViewModelLists(vm, userId, orgId, ct);
 
@@ -451,7 +451,7 @@ namespace VontaGenta.Controllers
             return null;
         }
 
-        private async Task<string?> PopulateCreateViewModelLists(CostEntryCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelLists(CostEntryFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var getProjectsDTO = await _projectsService.GetProjectsForMemberOrg(userId, orgId, ct);
 
