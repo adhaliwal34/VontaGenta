@@ -113,7 +113,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var vm = new CostCategoryCreateViewModel();
+            var vm = new CostCategoryFormViewModel();
 
             return View(vm);
         }
@@ -121,7 +121,7 @@ namespace VontaGenta.Controllers
         // POST: CostCategories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] CostCategoryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(CostCategoryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -179,7 +179,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var vm = new CostCategoryEditViewModel();
+            var vm = new CostCategoryFormViewModel();
 
             _mapper.Map(dto.Category, vm);
 
@@ -189,13 +189,8 @@ namespace VontaGenta.Controllers
         // POST: CostCategories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] CostCategoryEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, CostCategoryFormViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -210,7 +205,7 @@ namespace VontaGenta.Controllers
                 return View(vm);
             }
 
-            var editedCategory = new Category();
+            var editedCategory = new Category { ID = id };
 
             _mapper.Map(vm, editedCategory);
 

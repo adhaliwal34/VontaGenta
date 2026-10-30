@@ -20,10 +20,8 @@ namespace VontaGenta.Mapping
             CreateMap<Category, CostCategoryDetailsViewModel>()
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.User.Name));
 
-            CreateMap<Category, CostCategoryEditViewModel>();
-            CreateMap<CostCategoryEditViewModel, Category>();
-
-            CreateMap<CostCategoryCreateViewModel, Category>();
+            CreateMap<Category, CostCategoryFormViewModel>();
+            CreateMap<CostCategoryFormViewModel, Category>();
         }
     }
 }

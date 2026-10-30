@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace VontaGenta.Models
 {
-    public class CostCategoryCreateViewModel
+    public class CostCategoryFormViewModel
     {
         [Required]
         public string Name { get; set; }
