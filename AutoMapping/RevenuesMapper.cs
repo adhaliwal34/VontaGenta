@@ -12,8 +12,8 @@ namespace VontaGenta.Mapping
                 .ForMember(d => d.ProjectName, opt => opt.MapFrom(s => s.Project.Name))
                 .ForMember(d => d.CurrencySymbol, opt => opt.MapFrom(s => s.Currency.Symbol));
 
-            CreateMap<Revenue, RevenueCreateViewModel>();
-            CreateMap<RevenueCreateViewModel, Revenue>();
+            CreateMap<Revenue, RevenueFormViewModel>();
+            CreateMap<RevenueFormViewModel, Revenue>();
         }
     }
 }

@@ -105,7 +105,7 @@ namespace VontaGenta.Controllers
             // Always use the User's TZ now date to populate the date.
             // This will display a sensible date for the user in their time zone. If midnight UTC time is used it could convert to the previous day in the user's time zone. If user's time zone is behind UTC.
             // If user is viewing today's date then use User's TZ now to populate the date, otherwise populate the date from the date viewed.
-            var vm = new RevenueCreateViewModel
+            var vm = new RevenueFormViewModel
             {
                 FilterByDate = filterByDate ?? userTzNow,
                 EntryDate = filterByDate == null || filterByDate.Value.Date == userTzNow.Date ? userTzNow : new DateTime(filterByDate.Value.Year, filterByDate.Value.Month, filterByDate.Value.Day, 0, 0, 0),
@@ -140,7 +140,7 @@ namespace VontaGenta.Controllers
         // POST: Revenues/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Description,Amount,CurrencyID,EntryDate,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(RevenueFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -234,7 +234,7 @@ namespace VontaGenta.Controllers
             }
 
             // Reusing the create view model for convenience.
-            var vm = new RevenueCreateViewModel();
+            var vm = new RevenueFormViewModel();
 
             _mapper.Map(dto.Revenue, vm);
 
@@ -254,7 +254,7 @@ namespace VontaGenta.Controllers
         // POST: Revenues/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,Description,Amount,CurrencyID,EntryDate,ProjectID,FilterByDate")] RevenueCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, RevenueFormViewModel vm, CancellationToken ct)
         {
 
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new InvalidOperationException("Logged in user not found");
@@ -279,9 +279,9 @@ namespace VontaGenta.Controllers
                 return View(vm);
             }
 
-            var getRevenueDto = await _revenuesService.GetRevenueById(vm.ID, user.Id, ct);
+            var getRevenueDto = await _revenuesService.GetRevenueById(id, user.Id, ct);
 
-            var updatedRevenue = new Revenue();
+            var updatedRevenue = new Revenue { ID = id };
 
             _mapper.Map(vm, updatedRevenue);
 
@@ -358,7 +358,7 @@ namespace VontaGenta.Controllers
             return RedirectToAction(nameof(Index), new { filterByDate });
         }
 
-        private async Task<string?> PopulateCreateViewModelLists(RevenueCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelLists(RevenueFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var getProjectsDTO = await _projectsService.GetProjectsForMemberOrg(userId, orgId, ct);
 
@@ -392,7 +392,7 @@ namespace VontaGenta.Controllers
             return null;
         }
 
-        private async Task<string?> PopulateCreateViewModelSelectLists(RevenueCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelSelectLists(RevenueFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var errors = await PopulateCreateViewModelLists(vm, userId, orgId, ct);
 
