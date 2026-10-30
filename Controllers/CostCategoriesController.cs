@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -12,16 +12,13 @@ namespace VontaGenta.Controllers
     public class CostCategoriesController : BaseController
     {
         private readonly IAppUserRepo _appUserRepo;
-        private readonly IMapper _mapper;
         private readonly ICostCategoriesService _costCategoriesService;
 
         public CostCategoriesController(IAppUserRepo appUserRepo,
-            IMapper mapper,
             ICostCategoriesService costCategoriesService,
             IUserOrgsService userOrgsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
-            _mapper = mapper;
             _costCategoriesService = costCategoriesService;
         }
 
@@ -63,7 +60,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Category, CostCategoryDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -96,7 +93,7 @@ namespace VontaGenta.Controllers
 
             var vm = new CostCategoryDetailsViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }
@@ -113,7 +110,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var vm = new CostCategoryCreateViewModel();
+            var vm = new CostCategoryFormViewModel();
 
             return View(vm);
         }
@@ -121,7 +118,7 @@ namespace VontaGenta.Controllers
         // POST: CostCategories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] CostCategoryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(CostCategoryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -139,7 +136,7 @@ namespace VontaGenta.Controllers
 
             var category = new Category();
 
-            _mapper.Map(vm, category);
+            vm.MapTo(category);
 
             category.AppUserID = user.Id;
             category.OrgID = activeOrg.ID;
@@ -179,9 +176,9 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var vm = new CostCategoryEditViewModel();
+            var vm = new CostCategoryFormViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }
@@ -189,13 +186,8 @@ namespace VontaGenta.Controllers
         // POST: CostCategories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] CostCategoryEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, CostCategoryFormViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -210,13 +202,13 @@ namespace VontaGenta.Controllers
                 return View(vm);
             }
 
-            var editedCategory = new Category();
+            var editedCategory = new Category { ID = id };
 
-            _mapper.Map(vm, editedCategory);
+            vm.MapTo(editedCategory);
 
             editedCategory.AppUserID = user.Id;
 
-            var dto = await _costCategoriesService.UpdateCategory(id, editedCategory, user.Id, ct);
+            var dto = await _costCategoriesService.UpdateCategory(editedCategory, user.Id, ct);
 
             if (!dto.IsSuccess)
             {
@@ -253,7 +245,7 @@ namespace VontaGenta.Controllers
 
             var vm = new CostCategoryDetailsViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }

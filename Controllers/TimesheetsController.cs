@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -17,7 +17,6 @@ namespace VontaGenta.Controllers
         private readonly ITimesheetsService _timesheetsService;
         private readonly IProjectsService _projectsService;
         private readonly IAppTimeZonesService _appTimeZonesService;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _config;
 
         public TimesheetsController(IAppUserRepo appUserRepo,
@@ -25,14 +24,12 @@ namespace VontaGenta.Controllers
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
             IAppTimeZonesService appTimeZonesService,
-            IMapper mapper,
             IConfiguration config) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _timesheetsService = timesheetsService;
             _projectsService = projectsService;
             _appTimeZonesService = appTimeZonesService;
-            _mapper = mapper;
             _config = config;
         }
 
@@ -77,7 +74,7 @@ namespace VontaGenta.Controllers
             foreach (var timesheet in dto.List)
             {
                 var item = new TimesheetDetailsViewModel();
-                _mapper.Map(timesheet, item);
+                timesheet.MapTo(item);
 
                 // Coping the duration from the DTO to the view model if an entry exists.
                 if (dto.TimesheetDuration.TryGetValue(timesheet.ID, out var duration))
@@ -109,7 +106,7 @@ namespace VontaGenta.Controllers
             // Always use the UTC now time to populate the start time.
             // This will display a sensible time for the user in their time zone. If midnight UTC time is used it could convert to the previous day in the user's time zone. If user's time zone is behind UTC.
             // If user is viewing today's date then use UTC now to populate the start date and time, otherwise populate the start date from the date viewed and leave the time as the UTC now time.
-            var vm = new TimesheetCreateViewModel
+            var vm = new TimesheetFormViewModel
             {
                 FilterByDate = filterByDate ?? utcNow,
                 DateStart = filterByDate == null || filterByDate.Value.Date == utcNow.Date ? utcNow : new DateTime(filterByDate.Value.Year, filterByDate.Value.Month, filterByDate.Value.Day, utcNow.Hour, utcNow.Minute, utcNow.Second),
@@ -128,7 +125,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -144,7 +141,7 @@ namespace VontaGenta.Controllers
         // POST: Timesheets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,DateStart,TimeStart,DateEnd,TimeEnd,ProjectID,FilterByDate")] TimesheetCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(TimesheetFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -166,7 +163,7 @@ namespace VontaGenta.Controllers
             if (ModelState.IsValid)
             {
                 var timesheet = new Timesheet();
-                _mapper.Map(vm, timesheet);
+                vm.MapTo(timesheet);
 
                 var dto = await _timesheetsService.SaveTimesheet(timesheet, user.Id, user.TimeZone.ZoneId, ct);
 
@@ -234,7 +231,7 @@ namespace VontaGenta.Controllers
 
             var vm = new TimesheetDetailsViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -262,9 +259,9 @@ namespace VontaGenta.Controllers
             }
 
             // Reuse the create view model as there is bespoke code I don't want to repeat or move elsewhere.
-            var vm = new TimesheetCreateViewModel();
+            var vm = new TimesheetFormViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -282,7 +279,7 @@ namespace VontaGenta.Controllers
         // POST: Timesheets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,Name,Description,DateStart,TimeStart,DateEnd,TimeEnd,ProjectID,FilterByDate")] TimesheetCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, TimesheetFormViewModel vm, CancellationToken ct)
         {
 
             var user = await _appUserRepo.GetAppUserAndRelatedFields(HttpContext.User.Identity?.Name) ?? throw new InvalidOperationException("Logged in user not found");
@@ -305,11 +302,11 @@ namespace VontaGenta.Controllers
             if (ModelState.IsValid)
             {
 
-                var getTimesheetDto = await _timesheetsService.GetTimesheetById(vm.ID, user.Id, ct);
+                var getTimesheetDto = await _timesheetsService.GetTimesheetById(id, user.Id, ct);
 
-                var updatedTimesheet = new Timesheet();
+                var updatedTimesheet = new Timesheet { ID = id };
 
-                _mapper.Map(vm, updatedTimesheet);
+                vm.MapTo(updatedTimesheet);
 
                 // Since updated Timesheet comes from a view model it doesn't have all the required fields.
                 updatedTimesheet.AppUserID = user.Id;
@@ -353,7 +350,7 @@ namespace VontaGenta.Controllers
 
             var vm = new TimesheetDetailsViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -385,7 +382,7 @@ namespace VontaGenta.Controllers
             return RedirectToAction(nameof(Index), new { filterByDate });
         }
 
-        private async Task<string?> PopulateCreateViewModelLists(TimesheetCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelLists(TimesheetFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var getProjectsDTO = await _projectsService.GetProjectsForMemberOrg(userId, orgId, ct);
 
@@ -408,7 +405,7 @@ namespace VontaGenta.Controllers
             return null;
         }
 
-        private async Task<string?> PopulateCreateViewModelSelectLists(TimesheetCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelSelectLists(TimesheetFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var errors = await PopulateCreateViewModelLists(vm, userId, orgId, ct);
 

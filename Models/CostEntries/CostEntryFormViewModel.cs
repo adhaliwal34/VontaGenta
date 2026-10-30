@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Entities;
 namespace VontaGenta.Models
 {
-    public class CostEntryCreateViewModel : IHasCategoriesSelectLists, IHasProjectsSelectLists, IHasCurrenciesSelectLists
+    public class CostEntryFormViewModel : IHasCategoriesSelectLists, IHasProjectsSelectLists, IHasCurrenciesSelectLists
     {
-        public int ID { get; set; }
         [Required]
         [Display(Name = "Date")]
         public DateTime EntryDate { get; set; }
@@ -36,7 +35,7 @@ namespace VontaGenta.Models
         public int? Page { get; set; }
         public int? ItemsPerPage { get; set; }
 
-        public CostEntryCreateViewModel()
+        public CostEntryFormViewModel()
         {
             EntryDate = DateTime.Today;
             ProjectList = [];

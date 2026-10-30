@@ -1,7 +1,7 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 
 namespace VontaGenta.Services
@@ -9,13 +9,10 @@ namespace VontaGenta.Services
     public class OrgsService : IOrgsService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public OrgsService(IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public OrgsService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetOrgsDTO> GetOrgs(string userId, CancellationToken ct)
@@ -30,7 +27,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            _mapper.Map(orgs, dto.List);
+            dto.List = orgs.Select(o => o.ToDTO()).ToList();
 
             var activeOrg = await _unitOfWork.UserOrgs.GetActiveOrg(userId, ct);
 
@@ -119,11 +116,11 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateOrgDTO> UpdateOrg(int id, Org org, string userId, CancellationToken ct)
+        public async Task<UpdateOrgDTO> UpdateOrg(Org org, string userId, CancellationToken ct)
         {
             var dto = new UpdateOrgDTO();
 
-            var storedOrg = await _unitOfWork.Orgs.GetOrg(id, userId, ct);
+            var storedOrg = await _unitOfWork.Orgs.GetOrg(org.ID, userId, ct);
 
             if (storedOrg == null)
             {
@@ -132,7 +129,7 @@ namespace VontaGenta.Services
             }
 
             // Mapping should never overwrite user
-            _mapper.Map(org, storedOrg);
+            org.MapTo(storedOrg);
 
             try
             {

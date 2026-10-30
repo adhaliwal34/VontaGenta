@@ -9,6 +9,6 @@ namespace VontaGenta.Services
         Task<GetProjectDTO> GetProject(int id, string userId, CancellationToken ct);
         Task<GetProjectDTO> GetProjectAndRelatedFields(int id, string userId, CancellationToken ct);
         Task<SaveProjectDTO> SaveProject(Project project, string userId, CancellationToken ct);
-        Task<UpdateProjectDTO> UpdateProject(int id, Project project, string userId, CancellationToken ct);
+        Task<UpdateProjectDTO> UpdateProject(Project project, string userId, CancellationToken ct);
     }
 }

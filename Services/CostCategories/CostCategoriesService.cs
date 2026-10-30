@@ -1,20 +1,17 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 namespace VontaGenta.Services
 {
     public class CostCategoriesService : ICostCategoriesService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public CostCategoriesService(IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public CostCategoriesService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetCategoriesDTO> GetCategoriesForMemberOrg(string userId, int orgId, CancellationToken ct)
@@ -98,11 +95,11 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateCategoryDTO> UpdateCategory(int id, Category category, string userId, CancellationToken ct)
+        public async Task<UpdateCategoryDTO> UpdateCategory(Category category, string userId, CancellationToken ct)
         {
             var dto = new UpdateCategoryDTO();
 
-            var storedCategory = await _unitOfWork.CostCategories.GetCategory(id, ct);
+            var storedCategory = await _unitOfWork.CostCategories.GetCategory(category.ID, ct);
 
             if (storedCategory == null)
             {
@@ -119,7 +116,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            _mapper.Map(category, storedCategory);
+            category.MapTo(storedCategory);
 
             try
             {

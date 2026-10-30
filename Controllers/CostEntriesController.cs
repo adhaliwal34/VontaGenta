@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Data;
 using VontaGenta.Entities;
 using VontaGenta.Helpers;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -20,22 +20,19 @@ namespace VontaGenta.Controllers
         private readonly ICostEntriesService _costEntriesService;
         private readonly IProjectsService _projectsService;
         private readonly ICurrenciesService _currenciesService;
-        private readonly IMapper _mapper;
 
         public CostEntriesController(IAppUserRepo appUserRepo,
             ICostCategoriesService categoriesService,
             ICostEntriesService costEntriesService,
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
-            ICurrenciesService currenciesService,
-            IMapper mapper) : base(userOrgsService)
+            ICurrenciesService currenciesService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _categoriesService = categoriesService;
             _costEntriesService = costEntriesService;
             _projectsService = projectsService;
             _currenciesService = currenciesService;
-            _mapper = mapper;
         }
 
         // GET: CostEntries
@@ -124,7 +121,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<CostEntry, CostEntryDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -163,7 +160,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             return View(vm);
         }
@@ -171,7 +168,7 @@ namespace VontaGenta.Controllers
         // GET: CostEntries/Create
         public async Task<IActionResult> Create(int? year, int? month, int? page, int? itemsPerPage, CancellationToken ct)
         {
-            var vm = new CostEntryCreateViewModel
+            var vm = new CostEntryFormViewModel
             {
                 Year = year,
                 Month = month,
@@ -202,7 +199,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EntryDate,Name,Description,CategoryID,Amount,CurrencyID,ProjectID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(CostEntryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -232,7 +229,7 @@ namespace VontaGenta.Controllers
                 AppUserID = user.Id,
             };
 
-            _mapper.Map(vm, costEntry);
+            vm.MapTo(costEntry);
 
             var dto = await _costEntriesService.SaveCostEntry(costEntry, user.Id, ct);
 
@@ -287,7 +284,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
             }
 
-            var vm = new CostEntryCreateViewModel
+            var vm = new CostEntryFormViewModel
             {
                 Year = year,
                 Month = month,
@@ -295,7 +292,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -311,7 +308,7 @@ namespace VontaGenta.Controllers
         // POST: CostEntries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,EntryDate,Name,Description,CategoryID,ProjectID,Amount,CurrencyID,Year,Month,Page,ItemsPerPage")] CostEntryCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, CostEntryFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -337,9 +334,9 @@ namespace VontaGenta.Controllers
 
             try
             {
-                var editedCostEntry = new CostEntry();
+                var editedCostEntry = new CostEntry { ID = id };
 
-                _mapper.Map(vm, editedCostEntry);
+                vm.MapTo(editedCostEntry);
 
                 var dto = await _costEntriesService.UpdateCostEntry(editedCostEntry, user.Id, ct);
 
@@ -391,7 +388,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             return View(vm);
         }
@@ -424,7 +421,7 @@ namespace VontaGenta.Controllers
             return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
         }
 
-        private async Task<string?> PopulateCreateViewModelSelectLists(CostEntryCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelSelectLists(CostEntryFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var errors = await PopulateCreateViewModelLists(vm, userId, orgId, ct);
 
@@ -451,7 +448,7 @@ namespace VontaGenta.Controllers
             return null;
         }
 
-        private async Task<string?> PopulateCreateViewModelLists(CostEntryCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelLists(CostEntryFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var getProjectsDTO = await _projectsService.GetProjectsForMemberOrg(userId, orgId, ct);
 

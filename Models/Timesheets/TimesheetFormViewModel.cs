@@ -6,11 +6,10 @@ using VontaGenta.Entities;
 
 namespace VontaGenta.Models
 {
-    public class TimesheetCreateViewModel : IHasProjectsSelectLists
+    public class TimesheetFormViewModel : IHasProjectsSelectLists
     {
         // For filter on index page
         public DateTime? FilterByDate { get; set; }
-        public int ID { get; set; }
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }

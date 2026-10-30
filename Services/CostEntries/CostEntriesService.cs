@@ -1,20 +1,17 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 namespace VontaGenta.Services
 {
     public class CostEntriesService : ICostEntriesService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public CostEntriesService(IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public CostEntriesService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetTotalCountCostEntryDTO> GetTotalCountCostEntriesForMemberOrg(string userId, int orgId, int year, int month, CancellationToken ct)
@@ -176,7 +173,7 @@ namespace VontaGenta.Services
             }
 
             // Mapping should never overwrite user
-            _mapper.Map(costEntry, storedCostEntry);
+            costEntry.MapTo(storedCostEntry);
 
             if (!await _unitOfWork.CostEntries.AllowUpdateCostEntry(storedCostEntry.ID, userId, project.Client.OrgID, ct))
             {

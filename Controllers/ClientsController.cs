@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -13,16 +13,13 @@ namespace VontaGenta.Controllers
     {
         private readonly IAppUserRepo _appUserRepo;
         private readonly IClientsService _clientsService;
-        private readonly IMapper _mapper;
 
         public ClientsController(IAppUserRepo appUserRepo,
             IClientsService clientsService,
-            IUserOrgsService userOrgsService,
-            IMapper mapper) : base(userOrgsService)
+            IUserOrgsService userOrgsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _clientsService = clientsService;
-            _mapper = mapper;
         }
 
         // GET: Clients
@@ -55,7 +52,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Client, ClientDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -88,7 +85,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ClientDetailsViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }
@@ -96,7 +93,7 @@ namespace VontaGenta.Controllers
         // GET: Clients/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var vm = new ClientCreateViewModel();
+            var vm = new ClientFormViewModel();
 
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -113,7 +110,7 @@ namespace VontaGenta.Controllers
         // POST: Clients/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] ClientCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(ClientFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -137,7 +134,7 @@ namespace VontaGenta.Controllers
                     OrgID = activeOrg.ID
                 };
 
-                _mapper.Map(vm, client);
+                vm.MapTo(client);
 
                 var dto = await _clientsService.SaveClient(client, user.Id, ct);
 
@@ -184,9 +181,9 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var vm = new ClientEditViewModel();
+            var vm = new ClientFormViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }
@@ -194,13 +191,8 @@ namespace VontaGenta.Controllers
         // POST: Clients/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] ClientEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, ClientFormViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -217,11 +209,11 @@ namespace VontaGenta.Controllers
 
             try
             {
-                var editedClient = new Client();
+                var editedClient = new Client { ID = id };
 
-                _mapper.Map(vm, editedClient);
+                vm.MapTo(editedClient);
 
-                var dto = await _clientsService.UpdateClient(id, editedClient, user.Id, ct);
+                var dto = await _clientsService.UpdateClient(editedClient, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
@@ -268,7 +260,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ClientDetailsViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }

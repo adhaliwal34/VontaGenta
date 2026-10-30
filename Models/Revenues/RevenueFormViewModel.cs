@@ -6,11 +6,10 @@ using VontaGenta.Entities;
 
 namespace VontaGenta.Models
 {
-    public class RevenueCreateViewModel : IHasProjectsSelectLists, IHasCurrenciesSelectLists
+    public class RevenueFormViewModel : IHasProjectsSelectLists, IHasCurrenciesSelectLists
     {
         // For filter on index page
         public DateTime? FilterByDate { get; set; }
-        public int ID { get; set; }
 
         [MaxLength(255)]
         public string Description { get; set; }

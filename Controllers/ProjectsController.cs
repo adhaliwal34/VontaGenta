@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -16,18 +16,15 @@ namespace VontaGenta.Controllers
         private readonly IAppUserRepo _appUserRepo;
         private readonly IProjectsService _projectsService;
         private readonly IClientsService _clientsService;
-        private readonly IMapper _mapper;
 
         public ProjectsController(IAppUserRepo appUserRepo,
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
-            IClientsService clientsService,
-            IMapper mapper) : base(userOrgsService)
+            IClientsService clientsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _projectsService = projectsService;
             _clientsService = clientsService;
-            _mapper = mapper;
         }
 
         // GET: Projects
@@ -60,7 +57,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Project, ProjectDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -93,7 +90,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ProjectDetailsViewModel();
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }
@@ -101,7 +98,7 @@ namespace VontaGenta.Controllers
         // GET: Projects/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var vm = new ProjectCreateViewModel();
+            var vm = new ProjectFormViewModel();
 
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -126,7 +123,7 @@ namespace VontaGenta.Controllers
         // POST: Projects/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,StartDate,EndDate,ClientID")] ProjectCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Create(ProjectFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -155,7 +152,7 @@ namespace VontaGenta.Controllers
                 AppUserID = user.Id
             };
 
-            _mapper.Map(vm, project);
+            vm.MapTo(project);
 
             var dto = await _projectsService.SaveProject(project, user.Id, ct);
 
@@ -192,7 +189,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var vm = new ProjectCreateViewModel();
+            var vm = new ProjectFormViewModel();
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -210,7 +207,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }
@@ -218,7 +215,7 @@ namespace VontaGenta.Controllers
         // POST: Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ID,Name,Description,StartDate,EndDate,ClientID")] ProjectCreateViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, ProjectFormViewModel vm, CancellationToken ct)
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
@@ -233,11 +230,11 @@ namespace VontaGenta.Controllers
             {
                 try
                 {
-                    var editedProject = new Project();
+                    var editedProject = new Project { ID = id };
 
-                    _mapper.Map(vm, editedProject);
+                    vm.MapTo(editedProject);
 
-                    var dto = await _projectsService.UpdateProject(vm.ID, editedProject, user.Id, ct);
+                    var dto = await _projectsService.UpdateProject(editedProject, user.Id, ct);
 
                     if (!dto.IsSuccess)
                     {
@@ -291,7 +288,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ProjectDetailsViewModel();
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }
@@ -320,7 +317,7 @@ namespace VontaGenta.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<string?> PopulateCreateViewModelLists(ProjectCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelLists(ProjectFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var getClientsDTO = await _clientsService.GetClientsForMemberOrg(orgId, userId, ct);
 
@@ -343,7 +340,7 @@ namespace VontaGenta.Controllers
             return null;
         }
 
-        private async Task<string?> PopulateCreateViewModelSelectLists(ProjectCreateViewModel vm, string userId, int orgId, CancellationToken ct)
+        private async Task<string?> PopulateCreateViewModelSelectLists(ProjectFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
             var errors = await PopulateCreateViewModelLists(vm, userId, orgId, ct);
 

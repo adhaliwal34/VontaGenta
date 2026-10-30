@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -13,20 +13,17 @@ namespace VontaGenta.Controllers
     {
         private readonly IOrgsService _orgsService;
         private readonly IAppUserRepo _appUserRepo;
-        private readonly IMapper _mapper;
         private readonly IOrgInvitesService _orgInvitesService;
         private readonly ICurrenciesService _currenciesService;
 
         public OrgsController(IOrgsService orgsService,
             IUserOrgsService userOrgsService,
             IAppUserRepo appUserRepo,
-            IMapper mapper,
             IOrgInvitesService orgInvitesService,
             ICurrenciesService currenciesService) : base(userOrgsService)
         {
             _orgsService = orgsService;
             _appUserRepo = appUserRepo;
-            _mapper = mapper;
             _orgInvitesService = orgInvitesService;
             _currenciesService = currenciesService;
         }
@@ -60,12 +57,12 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List.Where(t => t.AppUserID == user.Id).ToList())
             {
-                vm.OrgsOwned.Add(_mapper.Map<Org, OrgDetailsViewModel>(item));
+                vm.OrgsOwned.Add(item.ToDetailsViewModel());
             }
 
             foreach (var item in dto.List.Where(t => t.AppUserID != user.Id).ToList())
             {
-                vm.OrgsJoined.Add(_mapper.Map<Org, OrgDetailsViewModel>(item));
+                vm.OrgsJoined.Add(item.ToDetailsViewModel());
             }
 
             if (!dto.ListHasActiveOrg)
@@ -126,7 +123,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             if (_userOrgsService == null)
             {
@@ -153,17 +150,21 @@ namespace VontaGenta.Controllers
         // GET: Orgs/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new OrgFormViewModel());
         }
 
         // POST: Orgs/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description")] Org org, CancellationToken ct)
+        public async Task<IActionResult> Create(OrgFormViewModel vm, CancellationToken ct)
         {
             if (ModelState.IsValid)
             {
                 var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
+
+                var org = new Org();
+
+                vm.MapTo(org);
 
                 org.AppUserID = user.Id;
 
@@ -172,14 +173,14 @@ namespace VontaGenta.Controllers
                 if (!dto.IsSuccess)
                 {
                     SetError(dto.Error);
-                    return View(org);
+                    return View(vm);
                 }
 
                 SetStatus(dto.Status);
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(org);
+            return View(vm);
         }
 
         // GET: Orgs/Edit/5
@@ -199,7 +200,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _orgsService.GetOrg(id.Value, user.Id, ct);
+            var dto = await _orgsService.GetOrgAndRelatedFields(id.Value, user.Id, ct);
 
             if (!dto.IsSuccess)
             {
@@ -219,7 +220,7 @@ namespace VontaGenta.Controllers
 
             //vm.Currencies = string.Join(",", currenciesDto.List.Select(c => c.Name));
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -227,13 +228,8 @@ namespace VontaGenta.Controllers
         // POST: Orgs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] OrgEditViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, OrgEditViewModel vm, CancellationToken ct)
         {
-            if (id != vm.ID)
-            {
-                return NotFound();
-            }
-
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
             var activeOrg = await GetActiveOrgSetName(user.Id, ct);
@@ -245,16 +241,27 @@ namespace VontaGenta.Controllers
 
             if (!ModelState.IsValid)
             {
+                // UserName is display only and is not posted back, so load it again for the page heading.
+                var orgDto = await _orgsService.GetOrgAndRelatedFields(id, user.Id, ct);
+
+                if (!orgDto.IsSuccess)
+                {
+                    SetError(orgDto.Error);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                vm.UserName = orgDto.Org.User.Name;
+
                 return View(vm);
             }
 
             try
             {
-                var editedOrg = new Org();
+                var editedOrg = new Org { ID = id };
 
-                _mapper.Map(vm, editedOrg);
+                vm.MapTo(editedOrg);
 
-                var dto = await _orgsService.UpdateOrg(id, editedOrg, user.Id, ct);
+                var dto = await _orgsService.UpdateOrg(editedOrg, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
@@ -300,7 +307,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -357,7 +364,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgAddInviteViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -429,7 +436,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgInviteDeleteConfirmationViewModel();
 
-            _mapper.Map(dto.OrgInvite, vm);
+            dto.OrgInvite.MapTo(vm);
 
             return View(vm);
         }
@@ -488,7 +495,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }

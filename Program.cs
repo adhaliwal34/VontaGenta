@@ -63,11 +63,6 @@ builder.Services.AddTimesheetsServices();
 
 builder.Services.AddUnitOfWorkServices();
 
-builder.Services.AddAutoMapper(
-    cfg => cfg.LicenseKey = builder.Configuration["Licenses:AutoMapper"] ?? throw new InvalidOperationException("AutoMapper license missing"),
-    typeof(Program).Assembly
-);
-
 
 var app = builder.Build();
 
