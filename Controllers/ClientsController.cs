@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -13,16 +13,13 @@ namespace VontaGenta.Controllers
     {
         private readonly IAppUserRepo _appUserRepo;
         private readonly IClientsService _clientsService;
-        private readonly IMapper _mapper;
 
         public ClientsController(IAppUserRepo appUserRepo,
             IClientsService clientsService,
-            IUserOrgsService userOrgsService,
-            IMapper mapper) : base(userOrgsService)
+            IUserOrgsService userOrgsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _clientsService = clientsService;
-            _mapper = mapper;
         }
 
         // GET: Clients
@@ -55,7 +52,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Client, ClientDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -88,7 +85,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ClientDetailsViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }
@@ -137,7 +134,7 @@ namespace VontaGenta.Controllers
                     OrgID = activeOrg.ID
                 };
 
-                _mapper.Map(vm, client);
+                vm.MapTo(client);
 
                 var dto = await _clientsService.SaveClient(client, user.Id, ct);
 
@@ -186,7 +183,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ClientFormViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }
@@ -214,7 +211,7 @@ namespace VontaGenta.Controllers
             {
                 var editedClient = new Client { ID = id };
 
-                _mapper.Map(vm, editedClient);
+                vm.MapTo(editedClient);
 
                 var dto = await _clientsService.UpdateClient(id, editedClient, user.Id, ct);
 
@@ -263,7 +260,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ClientDetailsViewModel();
 
-            _mapper.Map(dto.Client, vm);
+            dto.Client.MapTo(vm);
 
             return View(vm);
         }

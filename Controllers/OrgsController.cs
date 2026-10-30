@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -13,20 +13,17 @@ namespace VontaGenta.Controllers
     {
         private readonly IOrgsService _orgsService;
         private readonly IAppUserRepo _appUserRepo;
-        private readonly IMapper _mapper;
         private readonly IOrgInvitesService _orgInvitesService;
         private readonly ICurrenciesService _currenciesService;
 
         public OrgsController(IOrgsService orgsService,
             IUserOrgsService userOrgsService,
             IAppUserRepo appUserRepo,
-            IMapper mapper,
             IOrgInvitesService orgInvitesService,
             ICurrenciesService currenciesService) : base(userOrgsService)
         {
             _orgsService = orgsService;
             _appUserRepo = appUserRepo;
-            _mapper = mapper;
             _orgInvitesService = orgInvitesService;
             _currenciesService = currenciesService;
         }
@@ -60,12 +57,12 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List.Where(t => t.AppUserID == user.Id).ToList())
             {
-                vm.OrgsOwned.Add(_mapper.Map<Org, OrgDetailsViewModel>(item));
+                vm.OrgsOwned.Add(item.ToDetailsViewModel());
             }
 
             foreach (var item in dto.List.Where(t => t.AppUserID != user.Id).ToList())
             {
-                vm.OrgsJoined.Add(_mapper.Map<Org, OrgDetailsViewModel>(item));
+                vm.OrgsJoined.Add(item.ToDetailsViewModel());
             }
 
             if (!dto.ListHasActiveOrg)
@@ -126,7 +123,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             if (_userOrgsService == null)
             {
@@ -167,7 +164,7 @@ namespace VontaGenta.Controllers
 
                 var org = new Org();
 
-                _mapper.Map(vm, org);
+                vm.MapTo(org);
 
                 org.AppUserID = user.Id;
 
@@ -223,7 +220,7 @@ namespace VontaGenta.Controllers
 
             //vm.Currencies = string.Join(",", currenciesDto.List.Select(c => c.Name));
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -262,7 +259,7 @@ namespace VontaGenta.Controllers
             {
                 var editedOrg = new Org { ID = id };
 
-                _mapper.Map(vm, editedOrg);
+                vm.MapTo(editedOrg);
 
                 var dto = await _orgsService.UpdateOrg(id, editedOrg, user.Id, ct);
 
@@ -310,7 +307,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -367,7 +364,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgAddInviteViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }
@@ -439,7 +436,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgInviteDeleteConfirmationViewModel();
 
-            _mapper.Map(dto.OrgInvite, vm);
+            dto.OrgInvite.MapTo(vm);
 
             return View(vm);
         }
@@ -498,7 +495,7 @@ namespace VontaGenta.Controllers
 
             var vm = new OrgDetailsViewModel();
 
-            _mapper.Map(dto.Org, vm);
+            dto.Org.MapTo(vm);
 
             return View(vm);
         }

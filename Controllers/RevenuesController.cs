@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -18,7 +18,6 @@ namespace VontaGenta.Controllers
         private readonly IProjectsService _projectsService;
         private readonly IAppTimeZonesService _appTimeZonesService;
         private readonly ICurrenciesService _currenciesService;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _config;
 
         public RevenuesController(IAppUserRepo appUserRepo,
@@ -27,7 +26,6 @@ namespace VontaGenta.Controllers
             IUserOrgsService userOrgsService,
             IAppTimeZonesService appTimeZonesService,
             ICurrenciesService currenciesService,
-            IMapper mapper,
             IConfiguration config) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
@@ -35,7 +33,6 @@ namespace VontaGenta.Controllers
             _projectsService = projectsService;
             _appTimeZonesService = appTimeZonesService;
             _currenciesService = currenciesService;
-            _mapper = mapper;
             _config = config;
         }
 
@@ -79,7 +76,7 @@ namespace VontaGenta.Controllers
             foreach (var revenue in dto.List)
             {
                 var item = new RevenueDetailsViewModel();
-                _mapper.Map(revenue, item);
+                revenue.MapTo(item);
                 vm.Revenues.Add(item);
 
             }
@@ -124,7 +121,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
-            _mapper.Map(dto.Revenue, vm);
+            dto.Revenue.MapTo(vm);
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -162,7 +159,7 @@ namespace VontaGenta.Controllers
             if (ModelState.IsValid)
             {
                 var revenue = new Revenue();
-                _mapper.Map(vm, revenue);
+                vm.MapTo(revenue);
 
                 var dto = await _revenuesService.SaveRevenue(revenue, user.Id, ct);
 
@@ -206,7 +203,7 @@ namespace VontaGenta.Controllers
 
             var vm = new RevenueDetailsViewModel();
 
-            _mapper.Map(dto.Revenue, vm);
+            dto.Revenue.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -236,7 +233,7 @@ namespace VontaGenta.Controllers
             // Reusing the create view model for convenience.
             var vm = new RevenueFormViewModel();
 
-            _mapper.Map(dto.Revenue, vm);
+            dto.Revenue.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -283,7 +280,7 @@ namespace VontaGenta.Controllers
 
             var updatedRevenue = new Revenue { ID = id };
 
-            _mapper.Map(vm, updatedRevenue);
+            vm.MapTo(updatedRevenue);
 
             // Since updated Revenue comes from a view model it doesn't have all the required fields.
             updatedRevenue.AppUserID = user.Id;
@@ -325,7 +322,7 @@ namespace VontaGenta.Controllers
 
             var vm = new RevenueDetailsViewModel();
 
-            _mapper.Map(dto.Revenue, vm);
+            dto.Revenue.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 

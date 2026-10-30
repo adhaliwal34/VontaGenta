@@ -1,21 +1,18 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 namespace VontaGenta.Services
 {
     public class ClientsService : IClientsService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
         public ClientsService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetClientsDTO> GetClientsForMemberOrg(int orgId, string userId, CancellationToken ct)
@@ -132,7 +129,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            _mapper.Map(client, storedClient);
+            client.MapTo(storedClient);
 
             if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(storedClient, userId, ct))
             {

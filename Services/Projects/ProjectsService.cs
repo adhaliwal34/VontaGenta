@@ -1,20 +1,17 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 namespace VontaGenta.Services
 {
     public class ProjectsService : IProjectsService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public ProjectsService(IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public ProjectsService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetProjectsDTO> GetProjectsForMemberOrg(string userId, int orgId, CancellationToken ct)
@@ -131,7 +128,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            _mapper.Map(project, storedProject);
+            project.MapTo(storedProject);
 
             if (!await _unitOfWork.Projects.AllowUpdateProject(storedProject.ID, userId, ct))
             {

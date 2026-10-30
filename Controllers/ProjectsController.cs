@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -16,18 +16,15 @@ namespace VontaGenta.Controllers
         private readonly IAppUserRepo _appUserRepo;
         private readonly IProjectsService _projectsService;
         private readonly IClientsService _clientsService;
-        private readonly IMapper _mapper;
 
         public ProjectsController(IAppUserRepo appUserRepo,
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
-            IClientsService clientsService,
-            IMapper mapper) : base(userOrgsService)
+            IClientsService clientsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _projectsService = projectsService;
             _clientsService = clientsService;
-            _mapper = mapper;
         }
 
         // GET: Projects
@@ -60,7 +57,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Project, ProjectDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -93,7 +90,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ProjectDetailsViewModel();
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }
@@ -155,7 +152,7 @@ namespace VontaGenta.Controllers
                 AppUserID = user.Id
             };
 
-            _mapper.Map(vm, project);
+            vm.MapTo(project);
 
             var dto = await _projectsService.SaveProject(project, user.Id, ct);
 
@@ -210,7 +207,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }
@@ -235,7 +232,7 @@ namespace VontaGenta.Controllers
                 {
                     var editedProject = new Project { ID = id };
 
-                    _mapper.Map(vm, editedProject);
+                    vm.MapTo(editedProject);
 
                     var dto = await _projectsService.UpdateProject(id, editedProject, user.Id, ct);
 
@@ -291,7 +288,7 @@ namespace VontaGenta.Controllers
 
             var vm = new ProjectDetailsViewModel();
 
-            _mapper.Map(dto.Project, vm);
+            dto.Project.MapTo(vm);
 
             return View(vm);
         }

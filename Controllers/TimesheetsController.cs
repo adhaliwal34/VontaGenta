@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -17,7 +17,6 @@ namespace VontaGenta.Controllers
         private readonly ITimesheetsService _timesheetsService;
         private readonly IProjectsService _projectsService;
         private readonly IAppTimeZonesService _appTimeZonesService;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _config;
 
         public TimesheetsController(IAppUserRepo appUserRepo,
@@ -25,14 +24,12 @@ namespace VontaGenta.Controllers
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
             IAppTimeZonesService appTimeZonesService,
-            IMapper mapper,
             IConfiguration config) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _timesheetsService = timesheetsService;
             _projectsService = projectsService;
             _appTimeZonesService = appTimeZonesService;
-            _mapper = mapper;
             _config = config;
         }
 
@@ -77,7 +74,7 @@ namespace VontaGenta.Controllers
             foreach (var timesheet in dto.List)
             {
                 var item = new TimesheetDetailsViewModel();
-                _mapper.Map(timesheet, item);
+                timesheet.MapTo(item);
 
                 // Coping the duration from the DTO to the view model if an entry exists.
                 if (dto.TimesheetDuration.TryGetValue(timesheet.ID, out var duration))
@@ -128,7 +125,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -166,7 +163,7 @@ namespace VontaGenta.Controllers
             if (ModelState.IsValid)
             {
                 var timesheet = new Timesheet();
-                _mapper.Map(vm, timesheet);
+                vm.MapTo(timesheet);
 
                 var dto = await _timesheetsService.SaveTimesheet(timesheet, user.Id, user.TimeZone.ZoneId, ct);
 
@@ -234,7 +231,7 @@ namespace VontaGenta.Controllers
 
             var vm = new TimesheetDetailsViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -264,7 +261,7 @@ namespace VontaGenta.Controllers
             // Reuse the create view model as there is bespoke code I don't want to repeat or move elsewhere.
             var vm = new TimesheetFormViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 
@@ -309,7 +306,7 @@ namespace VontaGenta.Controllers
 
                 var updatedTimesheet = new Timesheet { ID = id };
 
-                _mapper.Map(vm, updatedTimesheet);
+                vm.MapTo(updatedTimesheet);
 
                 // Since updated Timesheet comes from a view model it doesn't have all the required fields.
                 updatedTimesheet.AppUserID = user.Id;
@@ -353,7 +350,7 @@ namespace VontaGenta.Controllers
 
             var vm = new TimesheetDetailsViewModel();
 
-            _mapper.Map(dto.Timesheet, vm);
+            dto.Timesheet.MapTo(vm);
 
             vm.FilterByDate = filterByDate;
 

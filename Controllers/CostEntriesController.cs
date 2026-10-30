@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VontaGenta.Data;
 using VontaGenta.Entities;
 using VontaGenta.Helpers;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -20,22 +20,19 @@ namespace VontaGenta.Controllers
         private readonly ICostEntriesService _costEntriesService;
         private readonly IProjectsService _projectsService;
         private readonly ICurrenciesService _currenciesService;
-        private readonly IMapper _mapper;
 
         public CostEntriesController(IAppUserRepo appUserRepo,
             ICostCategoriesService categoriesService,
             ICostEntriesService costEntriesService,
             IProjectsService projectsService,
             IUserOrgsService userOrgsService,
-            ICurrenciesService currenciesService,
-            IMapper mapper) : base(userOrgsService)
+            ICurrenciesService currenciesService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
             _categoriesService = categoriesService;
             _costEntriesService = costEntriesService;
             _projectsService = projectsService;
             _currenciesService = currenciesService;
-            _mapper = mapper;
         }
 
         // GET: CostEntries
@@ -124,7 +121,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<CostEntry, CostEntryDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -163,7 +160,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             return View(vm);
         }
@@ -232,7 +229,7 @@ namespace VontaGenta.Controllers
                 AppUserID = user.Id,
             };
 
-            _mapper.Map(vm, costEntry);
+            vm.MapTo(costEntry);
 
             var dto = await _costEntriesService.SaveCostEntry(costEntry, user.Id, ct);
 
@@ -295,7 +292,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
 
@@ -339,7 +336,7 @@ namespace VontaGenta.Controllers
             {
                 var editedCostEntry = new CostEntry { ID = id };
 
-                _mapper.Map(vm, editedCostEntry);
+                vm.MapTo(editedCostEntry);
 
                 var dto = await _costEntriesService.UpdateCostEntry(editedCostEntry, user.Id, ct);
 
@@ -391,7 +388,7 @@ namespace VontaGenta.Controllers
                 ItemsPerPage = itemsPerPage
             };
 
-            _mapper.Map(dto.CostEntry, vm);
+            dto.CostEntry.MapTo(vm);
 
             return View(vm);
         }

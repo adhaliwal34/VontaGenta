@@ -19,7 +19,7 @@ The database schema is kept in [DatabaseBackups/vonta_genta_db_schema.sql](Datab
 
 ## Architecture
 
-Layering: `Controllers` → `Services` → `Data` (repos) → PostgreSQL. Each feature (Clients, Projects, CostEntries, Revenues, Timesheets, Orgs, ...) has a file set in each layer, plus `Models/<Feature>` (view models), `AutoMapping/<Feature>Mapper.cs` and `DependencyInjection/<Feature>ServicesExtensions.cs`. A new feature must be registered with an `Add<Feature>Services()` call in [Program.cs](Program.cs).
+Layering: `Controllers` → `Services` → `Data` (repos) → PostgreSQL. Each feature (Clients, Projects, CostEntries, Revenues, Timesheets, Orgs, ...) has a file set in each layer, plus `Models/<Feature>` (view models), `Mapping/<Feature>Mappings.cs` (manual extension-method mapping, no AutoMapper) and `DependencyInjection/<Feature>ServicesExtensions.cs`. A new feature must be registered with an `Add<Feature>Services()` call in [Program.cs](Program.cs).
 
 ### Data access: Dapper, not EF, for app data
 - Entity Framework (`ApplicationDbContext`) is used only for ASP.NET Identity (`AppUser`, roles) and Identity UI under `Areas/Identity`.
@@ -36,7 +36,6 @@ Permission checks are hard-coded in SQL. Typically a service calls a repo `Allow
 Services return per-operation DTOs (`Services/<Feature>/*DTOs.cs`) with an `Error` string and an `IsSuccess` property. Controllers surface them through `BaseController.SetError` / `SetStatus` (TempData). Repos catch exceptions and use `ErrorHelpers.GetExceptionError`.
 
 ### Other notes
-- AutoMapper 15 needs a license key at `Licenses:AutoMapper` in config, and startup throws without it.
 - Serilog writes to `logs/` and is configured in `appsettings.json`.
 - Select lists for views are built by `ViewHelpers/SelectListHelpers.cs` via the `IHas*SelectLists` interfaces in `Models/Interfaces`.
 - Registration is gated by the `RegistrationEnabled` setting, and hCaptcha and AWS SES email are wired in via the `Hcaptcha` and `Emails` services.

@@ -1,20 +1,17 @@
 using System.Data;
-using AutoMapper;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 
 namespace VontaGenta.Services
 {
     public class CostCategoriesService : ICostCategoriesService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public CostCategoriesService(IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public CostCategoriesService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<GetCategoriesDTO> GetCategoriesForMemberOrg(string userId, int orgId, CancellationToken ct)
@@ -119,7 +116,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            _mapper.Map(category, storedCategory);
+            category.MapTo(storedCategory);
 
             try
             {

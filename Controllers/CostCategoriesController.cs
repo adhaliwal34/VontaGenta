@@ -1,8 +1,8 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VontaGenta.Data;
 using VontaGenta.Entities;
+using VontaGenta.Mapping;
 using VontaGenta.Models;
 using VontaGenta.Services;
 
@@ -12,16 +12,13 @@ namespace VontaGenta.Controllers
     public class CostCategoriesController : BaseController
     {
         private readonly IAppUserRepo _appUserRepo;
-        private readonly IMapper _mapper;
         private readonly ICostCategoriesService _costCategoriesService;
 
         public CostCategoriesController(IAppUserRepo appUserRepo,
-            IMapper mapper,
             ICostCategoriesService costCategoriesService,
             IUserOrgsService userOrgsService) : base(userOrgsService)
         {
             _appUserRepo = appUserRepo;
-            _mapper = mapper;
             _costCategoriesService = costCategoriesService;
         }
 
@@ -63,7 +60,7 @@ namespace VontaGenta.Controllers
 
             foreach (var item in dto.List)
             {
-                vm.List.Add(_mapper.Map<Category, CostCategoryDetailsViewModel>(item));
+                vm.List.Add(item.ToDetailsViewModel());
             }
 
             return View(vm);
@@ -96,7 +93,7 @@ namespace VontaGenta.Controllers
 
             var vm = new CostCategoryDetailsViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }
@@ -139,7 +136,7 @@ namespace VontaGenta.Controllers
 
             var category = new Category();
 
-            _mapper.Map(vm, category);
+            vm.MapTo(category);
 
             category.AppUserID = user.Id;
             category.OrgID = activeOrg.ID;
@@ -181,7 +178,7 @@ namespace VontaGenta.Controllers
 
             var vm = new CostCategoryFormViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }
@@ -207,7 +204,7 @@ namespace VontaGenta.Controllers
 
             var editedCategory = new Category { ID = id };
 
-            _mapper.Map(vm, editedCategory);
+            vm.MapTo(editedCategory);
 
             editedCategory.AppUserID = user.Id;
 
@@ -248,7 +245,7 @@ namespace VontaGenta.Controllers
 
             var vm = new CostCategoryDetailsViewModel();
 
-            _mapper.Map(dto.Category, vm);
+            dto.Category.MapTo(vm);
 
             return View(vm);
         }
