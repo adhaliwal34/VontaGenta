@@ -39,6 +39,7 @@ msbuild.wrn
 .vs/
 
 appsettings.*
+!appsettings.example.json
 [Pp]roperties/
 
 # Logs
