@@ -47,7 +47,7 @@ These are the steps for creating a Postgres DB in a docker container in a Ubuntu
    POSTGRES_PASSWORD=<choose-a-password>
    ```
 
-4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 3 above. This init script only runs once, when the data volume is empty.
+4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 3 of the "Getting started" section above. This init script only runs once, when the data volume is empty.
 
    ```sql
    -- Create the application database
