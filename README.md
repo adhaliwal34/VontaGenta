@@ -25,11 +25,11 @@ Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
 1. Set up Postgres (an example is given below).
 2. Load the schema from [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseBackups/vonta_genta_db_schema.sql`.
-3. Copy `appsettings.example.json` to `appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
+3. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
 4. Run the app:
 
    ```bash
-   dotnet run --project VontaGenta.csproj
+   dotnet run --project src/VontaGenta/VontaGenta.csproj
    ```
 
 Registration is controlled by the `RegistrationEnabled` setting.
@@ -76,10 +76,10 @@ The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. R
 
 ## Tests
 
-The xUnit tests live in a sibling repository, `VontaGentaTest`, which references this project:
+The xUnit tests are in [tests/VontaGenta.Tests](tests/VontaGenta.Tests):
 
    ```bash
-   dotnet test ../VontaGentaTest/VontaGentaTest.csproj
+   dotnet test VontaGenta.sln
    ```
 
 ## Licence
