@@ -23,9 +23,10 @@ See [CLAUDE.md](CLAUDE.md) for a fuller description.
 
 Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
-1. Create a database and load the schema from [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql).
-2. Copy `appsettings.example.json` to `appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
-3. Run the app:
+1. Set up Postgres (an example is given below).
+2. Load the schema from [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseBackups/vonta_genta_db_schema.sql`.
+3. Copy `appsettings.example.json` to `appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
+4. Run the app:
 
    ```bash
    dotnet run --project VontaGenta.csproj
@@ -33,13 +34,53 @@ Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
 Registration is controlled by the `RegistrationEnabled` setting.
 
+### Example Postgres setup
+
+These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup I use.
+
+1. SSH to the VM.
+2. Create a docker volume so that data is retained after container shutdown and restart: `sudo docker volume create pg_data`
+3. In one directory, create the `.env` file. Do not commit it.
+
+   ```text
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=<choose-a-password>
+   ```
+
+4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 3 of the "Getting started" section above. This init script only runs once, when the data volume is empty.
+
+   ```sql
+   -- Create the application database
+   CREATE DATABASE vonta_genta_db;
+
+   -- Create the application user (non-superuser)
+   CREATE USER vonta_genta_db_user WITH PASSWORD '<choose-a-password>';
+
+   -- Grant privileges on the database
+   GRANT ALL PRIVILEGES ON DATABASE vonta_genta_db TO vonta_genta_db_user;
+
+   -- Connect to the app database to configure schema permissions
+   \c vonta_genta_db
+
+   -- Ensure user can create tables in the public schema
+   GRANT ALL ON SCHEMA public TO vonta_genta_db_user;
+   ```
+
+5. From that directory, run the container:
+
+   ```bash
+   sudo docker run --name vonta_postgres      --env-file .env      -v $(pwd)/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql      -v pg_data:/var/lib/postgresql/data      -p 5432:5432      --restart always      -d postgres:17
+   ```
+
+The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. Restrict access with a firewall rule or bind to a specific IP if the VM is reachable beyond your machine.
+
 ## Tests
 
 The xUnit tests live in a sibling repository, `VontaGentaTest`, which references this project:
 
-```bash
-dotnet test ../VontaGentaTest/VontaGentaTest.csproj
-```
+   ```bash
+   dotnet test ../VontaGentaTest/VontaGentaTest.csproj
+   ```
 
 ## Licence
 
