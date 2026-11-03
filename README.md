@@ -36,7 +36,7 @@ Registration is controlled by the `RegistrationEnabled` setting.
 
 ### Example Postgres setup
 
-These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup I use.
+These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup AJ uses.
 
 1. SSH to the VM.
 2. Create a docker volume so that data is retained after container shutdown and restart: `sudo docker volume create pg_data`
@@ -90,7 +90,7 @@ Apache-2.0 grants no trademark rights, so please don't use the name "VontaGenta"
 
 ## How this was built
 
-VontaGenta is a portfolio project. I designed the architecture and the domain model, and I directed and reviewed all of the work. I used AI assistance (Claude Code) throughout development, including writing code, refactoring, tests and documentation. Commits that include AI assistance carry a `Co-Authored-By` trailer.
+The initial code was written by AJ Dhaliwal and represents years of his work and study in the field of Project Management software. This repo was created as portfolio project and an opportunity to experiment with AI-Assisted coding. Commits that include AI assistance carry a `Co-Authored-By` trailer.
 
 ## Third-party software
 
