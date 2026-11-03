@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VontaGenta", "VontaGenta.csproj", "{CA899B87-720B-4C2E-8F75-CA23EBBB61F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VontaGenta", "src\VontaGenta\VontaGenta.csproj", "{CA899B87-720B-4C2E-8F75-CA23EBBB61F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VontaGentaTest", "..\VontaGentaTest\VontaGentaTest.csproj", "{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VontaGenta.Tests", "tests\VontaGenta.Tests\VontaGenta.Tests.csproj", "{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,7 +18,9 @@ Global
 		{CA899B87-720B-4C2E-8F75-CA23EBBB61F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA899B87-720B-4C2E-8F75-CA23EBBB61F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4928FD5-4DED-4126-B7C6-CA99A0303ED2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

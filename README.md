@@ -25,18 +25,18 @@ Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
 1. Set up Postgres (an example is given below).
 2. Load the schema from [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseBackups/vonta_genta_db_schema.sql`.
-3. Copy `appsettings.example.json` to `appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
+3. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
 4. Run the app:
 
    ```bash
-   dotnet run --project VontaGenta.csproj
+   dotnet run --project src/VontaGenta/VontaGenta.csproj
    ```
 
 Registration is controlled by the `RegistrationEnabled` setting.
 
 ### Example Postgres setup
 
-These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup I use.
+These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup AJ uses.
 
 1. SSH to the VM.
 2. Create a docker volume so that data is retained after container shutdown and restart: `sudo docker volume create pg_data`
@@ -76,10 +76,10 @@ The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. R
 
 ## Tests
 
-The xUnit tests live in a sibling repository, `VontaGentaTest`, which references this project:
+The xUnit tests are in [tests/VontaGenta.Tests](tests/VontaGenta.Tests):
 
    ```bash
-   dotnet test ../VontaGentaTest/VontaGentaTest.csproj
+   dotnet test VontaGenta.sln
    ```
 
 ## Licence
@@ -90,7 +90,7 @@ Apache-2.0 grants no trademark rights, so please don't use the name "VontaGenta"
 
 ## How this was built
 
-VontaGenta is a portfolio project. I designed the architecture and the domain model, and I directed and reviewed all of the work. I used AI assistance (Claude Code) throughout development, including writing code, refactoring, tests and documentation. Commits that include AI assistance carry a `Co-Authored-By` trailer.
+The initial code was written by AJ Dhaliwal and represents years of his work and study in the field of Project Management software. This repo was created as portfolio project and an opportunity to experiment with AI-Assisted coding. Commits that include AI assistance carry a `Co-Authored-By` trailer.
 
 ## Third-party software
 

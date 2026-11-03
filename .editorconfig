@@ -43,7 +43,7 @@ dotnet_analyzer_diagnostic.severity = suggestion
 # LoggerMessage delegates are a hot-path optimisation; not worth the boilerplate for error logging
 dotnet_diagnostic.CA1848.severity = none
 
-[{Migrations,Areas/Identity}/**.cs]
+[src/VontaGenta/{Migrations,Areas/Identity}/**.cs]
 generated_code = true
 
 [*.{sln,bat,cmd}]
