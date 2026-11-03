@@ -90,7 +90,7 @@ Apache-2.0 grants no trademark rights, so please don't use the name "VontaGenta"
 
 ## How this was built
 
-The initial code was written by AJ Dhaliwal and represents years of his work and study in the field of Project Management software. This repo was created as portfolio project and an opportunity to experiment with AI-Assisted coding. Commits that include AI assistance carry a `Co-Authored-By` trailer.
+The initial code was written by AJ Dhaliwal and represents years of his work and study in the field of Project Management software. This repo was created as a portfolio project and an opportunity to experiment with AI-Assisted coding. Commits that include AI assistance carry a `Co-Authored-By` trailer.
 
 ## Third-party software
 
