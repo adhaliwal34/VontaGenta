@@ -10,9 +10,9 @@ namespace VontaGenta.Controllers
     public class BaseController : Controller
     {
 
-        private readonly IUserOrgsService? _userOrgsService;
+        private readonly IUserOrgsService _userOrgsService;
 
-        protected BaseController(IUserOrgsService? userOrgsService = null)
+        protected BaseController(IUserOrgsService userOrgsService)
         {
             _userOrgsService = userOrgsService;
         }
@@ -71,11 +71,6 @@ namespace VontaGenta.Controllers
 
         protected async Task<Org?> GetActiveOrgSetName(string userId, CancellationToken ct)
         {
-            if (_userOrgsService == null)
-            {
-                return null;
-            }
-
             var activeOrgDto = await _userOrgsService.GetActiveOrg(userId, ct);
 
             if (activeOrgDto.IsSuccess)
