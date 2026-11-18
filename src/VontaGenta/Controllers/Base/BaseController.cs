@@ -10,7 +10,7 @@ namespace VontaGenta.Controllers
     public class BaseController : Controller
     {
 
-        protected readonly IUserOrgsService? _userOrgsService;
+        private readonly IUserOrgsService? _userOrgsService;
 
         protected BaseController(IUserOrgsService? userOrgsService = null)
         {
