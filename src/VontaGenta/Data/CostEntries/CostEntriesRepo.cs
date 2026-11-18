@@ -10,7 +10,7 @@ namespace VontaGenta.Data
         public CostEntriesRepo(IUnitOfWork uow, ILogger<CostEntriesRepo> logger)
         : base(uow, logger)
         {
-            _logger.LogInformation("CostEntriesRepo instantiated");
+            Logger.LogInformation("CostEntriesRepo instantiated");
         }
 
         // Can view cost entries made by other users in the same org.
@@ -40,7 +40,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -1;
             }
         }
@@ -90,7 +90,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return new List<CostEntry>();
             }
         }
@@ -116,7 +116,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -165,7 +165,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -196,7 +196,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -1;
             }
         }
@@ -235,7 +235,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return 0;
             }
         }
@@ -265,7 +265,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return 0;
             }
         }
@@ -296,7 +296,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return false;
             }
         }
@@ -327,7 +327,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return false;
             }
         }
@@ -360,7 +360,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return false;
             }
         }

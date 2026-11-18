@@ -11,7 +11,7 @@ namespace VontaGenta.Data
         public OrgInvitesRepo(IUnitOfWork uow, ILogger<OrgInvitesRepo> logger)
         : base(uow, logger)
         {
-            _logger.LogInformation("OrgInvitesRepo instantiated");
+            Logger.LogInformation("OrgInvitesRepo instantiated");
         }
 
         // Get all invites to a org user is creator of.
@@ -57,7 +57,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -91,7 +91,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -125,7 +125,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -166,7 +166,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -1;
             }
         }
@@ -197,7 +197,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -2;
             }
         }
@@ -224,7 +224,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -2;
             }
         }
