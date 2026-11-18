@@ -15,6 +15,7 @@ namespace VontaGenta.Controllers
         private readonly IAppUserRepo _appUserRepo;
         private readonly IOrgInvitesService _orgInvitesService;
         private readonly ICurrenciesService _currenciesService;
+        private readonly IUserOrgsService _userOrgsService;
 
         public OrgsController(IOrgsService orgsService,
             IUserOrgsService userOrgsService,
@@ -23,6 +24,7 @@ namespace VontaGenta.Controllers
             ICurrenciesService currenciesService) : base(userOrgsService)
         {
             _orgsService = orgsService;
+            _userOrgsService = userOrgsService;
             _appUserRepo = appUserRepo;
             _orgInvitesService = orgInvitesService;
             _currenciesService = currenciesService;
@@ -84,12 +86,6 @@ namespace VontaGenta.Controllers
         {
             var user = await _appUserRepo.GetAppUser(HttpContext.User) ?? throw new InvalidOperationException("Logged in user not found");
 
-            if (_userOrgsService == null)
-            {
-                SetError("Essential service not found.");
-                return RedirectToAction("Index", "Home");
-            }
-
             var dto = await _userOrgsService.SetActiveOrg(user.Id, id, ct);
 
             if (!dto.IsSuccess)
@@ -124,12 +120,6 @@ namespace VontaGenta.Controllers
             var vm = new OrgDetailsViewModel();
 
             dto.Org.MapTo(vm);
-
-            if (_userOrgsService == null)
-            {
-                SetError("Essential service not found.");
-                return RedirectToAction("Index", "Home");
-            }
 
             var orgMembersDto = await _userOrgsService.GetUsersInOrg(dto.Org.ID, ct);
 
@@ -512,12 +502,6 @@ namespace VontaGenta.Controllers
             if (activeOrg == null)
             {
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
-            }
-
-            if (_userOrgsService == null)
-            {
-                SetError("Essential service not found.");
-                return RedirectToAction("Index", "Home");
             }
 
             var dto = await _userOrgsService.LeaveOrg(user.Id, id, ct);

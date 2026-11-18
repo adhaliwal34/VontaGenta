@@ -8,7 +8,7 @@ namespace VontaGenta.Data
         public AppTimeZonesRepo(IUnitOfWork uow, ILogger<AppTimeZonesRepo> logger)
             : base(uow, logger)
         {
-            _logger.LogInformation("AppTimeZonesRepo instantiated");
+            Logger.LogInformation("AppTimeZonesRepo instantiated");
         }
 
         public async Task<List<AppTimeZone>> GetTimeZones(CancellationToken ct)
@@ -26,7 +26,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return [];
             }
         }

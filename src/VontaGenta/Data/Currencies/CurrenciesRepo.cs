@@ -9,7 +9,7 @@ namespace VontaGenta.Data
         public CurrenciesRepo(IUnitOfWork uow, ILogger<CurrenciesRepo> logger)
         : base(uow, logger)
         {
-            _logger.LogInformation("CurrenciesRepo instantiated");
+            Logger.LogInformation("CurrenciesRepo instantiated");
         }
 
         public async Task<List<Currency>> GetCurrencies(CancellationToken ct)
@@ -30,7 +30,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return new List<Currency>();
             }
         }
@@ -55,7 +55,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }

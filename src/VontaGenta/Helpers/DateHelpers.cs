@@ -19,7 +19,7 @@ namespace VontaGenta.Helpers
 
     public class Months
     {
-        public List<Month> List;
+        public List<Month> List { get; }
 
         public Months()
         {

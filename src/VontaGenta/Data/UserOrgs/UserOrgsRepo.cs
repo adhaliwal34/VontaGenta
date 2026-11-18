@@ -10,7 +10,7 @@ namespace VontaGenta.Data
         public UserOrgsRepo(IUnitOfWork uow, ILogger<UserOrgsRepo> logger)
         : base(uow, logger)
         {
-            _logger.LogInformation("UserOrgsRepo instantiated");
+            Logger.LogInformation("UserOrgsRepo instantiated");
         }
 
         public async Task<List<UserOrg>?> GetUsersInOrg(int orgId, CancellationToken ct)
@@ -38,7 +38,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -64,7 +64,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return false;
             }
         }
@@ -97,7 +97,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return 0;
             }
         }
@@ -131,7 +131,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return null;
             }
         }
@@ -174,7 +174,7 @@ namespace VontaGenta.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error: {Exception}", ex);
+                Logger.LogError("Error: {Exception}", ex);
                 return -1;
             }
         }
