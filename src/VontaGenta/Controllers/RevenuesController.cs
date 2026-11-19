@@ -61,12 +61,12 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 // TODO test this. Can error be displayed too?
                 return StatusCode(500);
             }
 
-            vm.FilterByDate = dto.Date;
+            vm.FilterByDate = dto.AppDate;
 
             var userTzNow = _appTimeZonesService.ConvertFromUtcToTimeZone(user.TimeZone.ZoneId, DateTime.UtcNow);
             vm.Today = userTzNow;
@@ -117,7 +117,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
@@ -165,10 +165,10 @@ namespace VontaGenta.Controllers
 
                 if (!dto.IsSuccess)
                 {
-                    SetError(dto.Error);
-                    if (dto.ErrorList.Any())
+                    SetError(dto.AppError);
+                    if (dto.AppErrorList.Any())
                     {
-                        ModelState.AddValidationErrors(dto.ErrorList);
+                        ModelState.AddValidationErrors(dto.AppErrorList);
                     }
 
                     return View(vm);
@@ -197,7 +197,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
@@ -226,7 +226,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
@@ -289,8 +289,8 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
-                ModelState.AddValidationErrors(dto.ErrorList);
+                SetError(dto.AppError);
+                ModelState.AddValidationErrors(dto.AppErrorList);
 
                 return View(vm);
             }
@@ -316,7 +316,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index), new { filterByDate });
             }
 
@@ -347,7 +347,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
             }
 
             SetStatus(dto.Status);
@@ -363,7 +363,7 @@ namespace VontaGenta.Controllers
 
             if (!getProjectsDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting projects: {0}", getProjectsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting projects: {0}", getProjectsDTO.AppError);
             }
             else
             {
@@ -374,7 +374,7 @@ namespace VontaGenta.Controllers
 
             if (!getCurrenciesDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting currencies: {0}", getCurrenciesDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting currencies: {0}", getCurrenciesDTO.AppError);
             }
             else
             {

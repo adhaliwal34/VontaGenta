@@ -28,7 +28,7 @@ namespace VontaGenta.Services
 
             if (dto.Currency == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 

@@ -41,7 +41,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError($"{dto.Error}");
+                SetError($"{dto.AppError}");
             }
 
             if (existingStatus != null || dto.Status != null)
@@ -79,7 +79,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -140,7 +140,7 @@ namespace VontaGenta.Controllers
 
                 if (!dto.IsSuccess)
                 {
-                    SetError(dto.Error);
+                    SetError(dto.AppError);
                     return View(vm);
                 }
 
@@ -177,7 +177,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -217,7 +217,7 @@ namespace VontaGenta.Controllers
 
                 if (!dto.IsSuccess)
                 {
-                    SetError(dto.Error);
+                    SetError(dto.AppError);
                     return View(vm);
                 }
 
@@ -254,7 +254,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -285,7 +285,7 @@ namespace VontaGenta.Controllers
 
                 if (!dto.IsSuccess)
                 {
-                    SetError(dto.Error);
+                    SetError(dto.AppError);
                 }
 
                 SetStatus(dto.Status);

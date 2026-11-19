@@ -22,7 +22,7 @@ namespace VontaGenta.Services
 
             if (dto.Total == -1)
             {
-                dto.Error = "Error: Getting total count.";
+                dto.AppError = "Error: Getting total count.";
             }
 
             return dto;
@@ -43,7 +43,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostEntries.AllowGetCostEntry(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -51,7 +51,7 @@ namespace VontaGenta.Services
 
             if (dto.CostEntry == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -64,13 +64,13 @@ namespace VontaGenta.Services
 
             if (costEntry.AppUserID != userId)
             {
-                dto.Error = "Error: Cannot create cost entries for other users";
+                dto.AppError = "Error: Cannot create cost entries for other users";
                 return dto;
             }
 
             if (!await _unitOfWork.Projects.AllowGetProject(costEntry.ProjectID, userId, ct))
             {
-                dto.Error = "Error: Project not found.";
+                dto.AppError = "Error: Project not found.";
                 return dto;
             }
 
@@ -78,7 +78,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostCategories.AllowGetCostCategory(costEntry.CategoryID, userId, ct))
             {
-                dto.Error = "Error: Category not found.";
+                dto.AppError = "Error: Category not found.";
                 return dto;
             }
 
@@ -86,13 +86,13 @@ namespace VontaGenta.Services
 
             if (category == null || project == null)
             {
-                dto.Error = "Error: Project or category not found.";
+                dto.AppError = "Error: Project or category not found.";
                 return dto;
             }
 
             if (category.OrgID != project.Client.OrgID || !await _unitOfWork.UserOrgs.IsOrgMember(userId, project.Client.OrgID, ct))
             {
-                dto.Error = "Error: Org error.";
+                dto.AppError = "Error: Org error.";
                 return dto;
             }
 
@@ -101,7 +101,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostEntries.AllowCreateCostEntry(costEntry, userId, project.Client.OrgID, ct))
             {
-                dto.Error = "Error: Action not allowed";
+                dto.AppError = "Error: Action not allowed";
                 return dto;
             }
 
@@ -120,7 +120,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
@@ -128,7 +128,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 return dto;
             }
 
@@ -141,7 +141,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostEntries.AllowGetCostEntry(costEntry.ID, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -150,7 +150,7 @@ namespace VontaGenta.Services
 
             if (storedCostEntry == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -162,13 +162,13 @@ namespace VontaGenta.Services
 
             if (project == null)
             {
-                dto.Error = "Error: Project setting error";
+                dto.AppError = "Error: Project setting error";
                 return dto;
             }
 
             if (project.Client.OrgID != originalOrgID)
             {
-                dto.Error = "Error: Project setting error";
+                dto.AppError = "Error: Project setting error";
                 return dto;
             }
 
@@ -177,7 +177,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostEntries.AllowUpdateCostEntry(storedCostEntry.ID, userId, project.Client.OrgID, ct))
             {
-                dto.Error = "Error: Action not allowed";
+                dto.AppError = "Error: Action not allowed";
                 return dto;
             }
 
@@ -195,7 +195,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Update failed";
+                    dto.AppError = "Update failed";
                     // TODO log error
                     return dto;
                 }
@@ -204,7 +204,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error: Error on update";
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 
@@ -217,7 +217,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostEntries.AllowGetCostEntry(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -225,13 +225,13 @@ namespace VontaGenta.Services
 
             if (costEntry == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.CostEntries.AllowUpdateCostEntry(costEntry.ID, userId, costEntry.Project.Client.OrgID, ct))
             {
-                dto.Error = "Error: Action not allowed";
+                dto.AppError = "Error: Action not allowed";
                 return dto;
             }
 
@@ -249,7 +249,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -257,7 +257,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 // TODO log error
-                dto.Error = "Error: Error on delete";
+                dto.AppError = "Error: Error on delete";
                 return dto;
             }
 

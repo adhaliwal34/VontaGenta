@@ -108,13 +108,13 @@ namespace VontaGenta.Services
 
             if (id == null || id <= 0)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Timesheets.AllowGetTimesheetIfOrgMember(id.Value, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -122,7 +122,7 @@ namespace VontaGenta.Services
 
             if (dto.Timesheet == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -135,13 +135,13 @@ namespace VontaGenta.Services
 
             if (id == null || id <= 0)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Timesheets.AllowGetTimesheetIfOrgMember(id.Value, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -149,7 +149,7 @@ namespace VontaGenta.Services
 
             if (dto.Timesheet == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -175,7 +175,7 @@ namespace VontaGenta.Services
             }
             catch (Exception ex)
             {
-                return new GetTimesheetDTO { Error = ex.Message };
+                return new GetTimesheetDTO { AppError = ex.Message };
             }
 
             return new GetTimesheetDTO { Timesheet = timesheet };
@@ -191,7 +191,7 @@ namespace VontaGenta.Services
 
                 if (!await _unitOfWork.Timesheets.AllowCreateTimesheet(timesheet.ProjectID, userId, ct))
                 {
-                    dto.Error = "Failed to save item";
+                    dto.AppError = "Failed to save item";
                     return dto;
                 }
 
@@ -201,7 +201,7 @@ namespace VontaGenta.Services
 
                 if (errors.Any())
                 {
-                    dto.ErrorList = errors.GetErrors();
+                    dto.AppErrorList = errors.GetErrors();
                     return dto;
                 }
 
@@ -217,14 +217,14 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
             catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 // TODO log error
                 return dto;
             }
@@ -242,7 +242,7 @@ namespace VontaGenta.Services
 
                 if (!await _unitOfWork.Timesheets.AllowUpdateTimesheet(updatedTimesheet.ID, userId, ct))
                 {
-                    dto.Error = "Error: Not found";
+                    dto.AppError = "Error: Not found";
                     return dto;
                 }
 
@@ -250,8 +250,8 @@ namespace VontaGenta.Services
 
                 if (errors.Any())
                 {
-                    dto.ErrorList = errors.GetErrors();
-                    dto.Error = "Error on update";
+                    dto.AppErrorList = errors.GetErrors();
+                    dto.AppError = "Error on update";
                     return dto;
                 }
 
@@ -267,14 +267,14 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Update failed";
+                    dto.AppError = "Update failed";
                     return dto;
                 }
             }
             catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
-                dto.Error = "Error on update";
+                dto.AppError = "Error on update";
                 // TODO log error
                 return dto;
             }
@@ -288,13 +288,13 @@ namespace VontaGenta.Services
 
             if (id == null || id <= 0)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Timesheets.AllowUpdateTimesheet(id.Value, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -302,7 +302,7 @@ namespace VontaGenta.Services
 
             if (timesheet == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -320,7 +320,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -328,7 +328,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on delete";
+                dto.AppError = "Error on delete";
                 return dto;
             }
 

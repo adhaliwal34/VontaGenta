@@ -23,7 +23,7 @@ namespace VontaGenta.Services
 
             if (orgs == null)
             {
-                dto.Error = "Failed to get orgs";
+                dto.AppError = "Failed to get orgs";
                 return dto;
             }
 
@@ -55,7 +55,7 @@ namespace VontaGenta.Services
 
             if (dto.Org == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -70,7 +70,7 @@ namespace VontaGenta.Services
 
             if (dto.Org == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -83,7 +83,7 @@ namespace VontaGenta.Services
 
             if (org.AppUserID != userId)
             {
-                dto.Error = "Error: Cannot create orgs for other users";
+                dto.AppError = "Error: Cannot create orgs for other users";
                 return dto;
             }
 
@@ -101,7 +101,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
@@ -109,7 +109,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 return dto;
             }
 
@@ -124,7 +124,7 @@ namespace VontaGenta.Services
 
             if (storedOrg == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -145,7 +145,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Error: Error on update";
+                    dto.AppError = "Error: Error on update";
                     return dto;
                 }
             }
@@ -153,7 +153,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error: Error on update";
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 
@@ -168,13 +168,13 @@ namespace VontaGenta.Services
 
             if (org == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (org.AppUserID != userId)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -192,7 +192,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -200,7 +200,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on delete";
+                dto.AppError = "Error on delete";
                 return dto;
             }
 

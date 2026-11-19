@@ -29,7 +29,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.CostCategories.AllowGetCostCategory(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -37,7 +37,7 @@ namespace VontaGenta.Services
 
             if (dto.Category == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -50,19 +50,19 @@ namespace VontaGenta.Services
 
             if (category.OrgID == 0)
             {
-                dto.Error = "Error: Org must be selected.";
+                dto.AppError = "Error: Org must be selected.";
                 return dto;
             }
 
             if (!await _unitOfWork.CostCategories.AllowCreateCostCategory(category, userId, ct))
             {
-                dto.Error = "Error: Action not allowed.";
+                dto.AppError = "Error: Action not allowed.";
                 return dto;
             }
 
             if (category.AppUserID != userId)
             {
-                dto.Error = "Error: Cannot create categories for other users";
+                dto.AppError = "Error: Cannot create categories for other users";
                 return dto;
             }
 
@@ -80,7 +80,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
@@ -88,7 +88,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 return dto;
             }
 
@@ -103,7 +103,7 @@ namespace VontaGenta.Services
 
             if (storedCategory == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -112,7 +112,7 @@ namespace VontaGenta.Services
             // Any org member can edit a cost category in their org.
             if (!await _unitOfWork.CostCategories.AllowCreateCostCategory(category, userId, ct))
             {
-                dto.Error = "Error: Action not allowed.";
+                dto.AppError = "Error: Action not allowed.";
                 return dto;
             }
 
@@ -132,7 +132,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Update failed";
+                    dto.AppError = "Update failed";
                     return dto;
                 }
             }
@@ -140,7 +140,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 // TODO log error
-                dto.Error = "Error: Error on update";
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 
@@ -155,14 +155,14 @@ namespace VontaGenta.Services
 
             if (category == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             // Any org member can delete a cost category in their org.
             if (!await _unitOfWork.CostCategories.AllowCreateCostCategory(category, userId, ct))
             {
-                dto.Error = "Error: Action not allowed.";
+                dto.AppError = "Error: Action not allowed.";
                 return dto;
             }
 
@@ -179,7 +179,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -187,7 +187,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 // TODO log error
-                dto.Error = "Error: Error on delete";
+                dto.AppError = "Error: Error on delete";
                 return dto;
             }
 

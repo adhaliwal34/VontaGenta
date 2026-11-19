@@ -14,11 +14,11 @@ namespace VontaGenta.Data
         }
 
         // TODO currently only creator of items can get the items.
-        public async Task<IEnumerable<Revenue>> GetRevenuesAndRelatedFields(DateTime date, string userId, int orgId, CancellationToken ct)
+        public async Task<IEnumerable<Revenue>> GetRevenuesAndRelatedFields(DateTime appDate, string userId, int orgId, CancellationToken ct)
         {
             try
             {
-                var parameters = new { AppUserId = userId, EntryDate = date, OrgId = orgId };
+                var parameters = new { AppUserId = userId, EntryDate = appDate, OrgId = orgId };
                 var sql = @"SELECT
                         revenues.*
                         ,aspnetusers.*
