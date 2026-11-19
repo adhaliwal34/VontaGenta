@@ -35,11 +35,11 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Currency?> GetCurrency(int id, CancellationToken ct)
+        public async Task<Currency?> GetCurrency(int currencyId, CancellationToken ct)
         {
             try
             {
-                var parameters = new { Id = id };
+                var parameters = new { Id = currencyId };
                 var sql = @"SELECT
                             *
                             FROM currencies

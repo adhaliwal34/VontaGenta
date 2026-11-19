@@ -83,7 +83,7 @@ namespace VontaGenta.Data
         }
 
         public async Task BeginTransactionAsync(
-                IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+                IsolationLevel level = IsolationLevel.ReadCommitted,
                 CancellationToken ct = default)
         {
             if (_connection == null)
@@ -97,7 +97,7 @@ namespace VontaGenta.Data
             if (_transaction != null)
                 throw new InvalidOperationException("Transaction already started.");
 
-            _transaction = await _connection.BeginTransactionAsync(isolationLevel, ct);
+            _transaction = await _connection.BeginTransactionAsync(level, ct);
         }
 
         public async Task CommitAsync(CancellationToken ct = default)

@@ -13,9 +13,9 @@ namespace VontaGenta.Services
                           .ToDateTimeUnspecified();
         }
 
-        public DateTime ConvertFromTimeZoneToUtc(DateTime TimeZoneDateTime, string timeZone)
+        public DateTime ConvertFromTimeZoneToUtc(DateTime timeZoneDateTime, string timeZone)
         {
-            var local = LocalDateTime.FromDateTime(TimeZoneDateTime);
+            var local = LocalDateTime.FromDateTime(timeZoneDateTime);
             var zone = DateTimeZoneProviders.Tzdb[timeZone];
             ZonedDateTime zonedTime = local.InZoneLeniently(zone);
             return DateTime.SpecifyKind(zonedTime.ToDateTimeUtc(), DateTimeKind.Unspecified); // I don't want .NET to add Z letters to the DateTimes when saving to the database so DateTimeKind must be unspecified.
