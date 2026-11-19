@@ -5,7 +5,7 @@ namespace VontaGenta.Services
 {
     public class GetRevenuesDTO : RequestStatus
     {
-        public DateTime? Date { get; set; }
+        public DateTime? AppDate { get; set; }
         public List<Revenue> List { get; set; }
 
         public GetRevenuesDTO()

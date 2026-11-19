@@ -25,19 +25,19 @@ namespace VontaGenta.Services
 
             if (org == null)
             {
-                dto.Error = "Cannot find org";
+                dto.AppError = "Cannot find org";
                 return dto;
             }
 
             if (string.IsNullOrEmpty(emailsToInvite))
             {
-                dto.Error = "Must enter an email to invite or a comma separated list of emails to invite.";
+                dto.AppError = "Must enter an email to invite or a comma separated list of emails to invite.";
                 return dto;
             }
 
             if (emailsToInvite.Length > 2500)
             {
-                dto.Error = "The maximum length of the email list is 2500 characters.";
+                dto.AppError = "The maximum length of the email list is 2500 characters.";
                 return dto;
             }
 
@@ -50,7 +50,7 @@ namespace VontaGenta.Services
 
             if (existingInvites == null)
             {
-                dto.Error = "Error loading existing invites. Aborted.";
+                dto.AppError = "Error loading existing invites. Aborted.";
                 return dto;
             }
 
@@ -84,7 +84,7 @@ namespace VontaGenta.Services
                     else
                     {
                         await _unitOfWork.RollbackAsync(ct);
-                        dto.Error = "Sending invites failed";
+                        dto.AppError = "Sending invites failed";
                         return dto;
                     }
                 }
@@ -92,7 +92,7 @@ namespace VontaGenta.Services
                 {
                     await _unitOfWork.RollbackAsync(ct);
                     //TODO log error
-                    dto.Error = "Error sending invites.";
+                    dto.AppError = "Error sending invites.";
                     return dto;
                 }
             }
@@ -111,7 +111,7 @@ namespace VontaGenta.Services
             catch
             {
                 // TODO Log exception
-                dto.Error = "Error getting invites to orgs.";
+                dto.AppError = "Error getting invites to orgs.";
             }
 
             return dto;
@@ -127,13 +127,13 @@ namespace VontaGenta.Services
 
                 if (dto.OrgInvite == null)
                 {
-                    dto.Error = "Invite not found";
+                    dto.AppError = "Invite not found";
                 }
             }
             catch
             {
                 // TODO Log exception
-                dto.Error = "Error getting invites to orgs.";
+                dto.AppError = "Error getting invites to orgs.";
             }
 
             return dto;
@@ -149,7 +149,7 @@ namespace VontaGenta.Services
 
                 if (orgInvite == null)
                 {
-                    dto.Error = "Error accepting invite to org.";
+                    dto.AppError = "Error accepting invite to org.";
                     return dto;
                 }
 
@@ -164,7 +164,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Error accepting invite to org.";
+                    dto.AppError = "Error accepting invite to org.";
                     return dto;
                 }
             }
@@ -172,7 +172,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error accepting invite to org.";
+                dto.AppError = "Error accepting invite to org.";
                 return dto;
             }
 
@@ -189,7 +189,7 @@ namespace VontaGenta.Services
 
                 if (orgInvite == null)
                 {
-                    dto.Error = "Error ignoring invite to org.";
+                    dto.AppError = "Error ignoring invite to org.";
                     return dto;
                 }
 
@@ -205,7 +205,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Error ignoring invite to org.";
+                    dto.AppError = "Error ignoring invite to org.";
                     return dto;
                 }
             }
@@ -213,7 +213,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error ignoring invite to org.";
+                dto.AppError = "Error ignoring invite to org.";
                 return dto;
             }
 

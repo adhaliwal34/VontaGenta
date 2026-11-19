@@ -30,7 +30,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -38,7 +38,7 @@ namespace VontaGenta.Services
 
             if (dto.Client == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -51,7 +51,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -59,7 +59,7 @@ namespace VontaGenta.Services
 
             if (dto.Client == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -72,13 +72,13 @@ namespace VontaGenta.Services
 
             if (client.AppUserID != userId)
             {
-                dto.Error = "Error: Cannot create clients for other users";
+                dto.AppError = "Error: Cannot create clients for other users";
                 return dto;
             }
 
             if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(client, userId, ct))
             {
-                dto.Error = "Error: action not allowed";
+                dto.AppError = "Error: action not allowed";
                 return dto;
             }
 
@@ -96,7 +96,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
@@ -104,7 +104,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 return dto;
             }
 
@@ -117,7 +117,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.Clients.AllowGetClient(client.ID, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -125,7 +125,7 @@ namespace VontaGenta.Services
 
             if (storedClient == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -133,7 +133,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(storedClient, userId, ct))
             {
-                dto.Error = "Error: action not allowed";
+                dto.AppError = "Error: action not allowed";
                 return dto;
             }
 
@@ -151,7 +151,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Error: Error on update";
+                    dto.AppError = "Error: Error on update";
                     return dto;
                 }
             }
@@ -159,7 +159,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 // TODO log error
-                dto.Error = "Error: Error on update";
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 
@@ -172,7 +172,7 @@ namespace VontaGenta.Services
 
             if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -180,13 +180,13 @@ namespace VontaGenta.Services
 
             if (client == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(client, userId, ct))
             {
-                dto.Error = "Error: action not allowed";
+                dto.AppError = "Error: action not allowed";
                 return dto;
             }
 
@@ -204,7 +204,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -212,7 +212,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 // TODO log error
-                dto.Error = "Error: Error on update";
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 

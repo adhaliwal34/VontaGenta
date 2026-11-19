@@ -100,7 +100,7 @@ namespace VontaGenta.Controllers
 
             if (!countDto.IsSuccess)
             {
-                SetError($"{countDto.Error}");
+                SetError($"{countDto.AppError}");
                 return RedirectToAction("Index", "Home");
             }
 
@@ -110,7 +110,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError($"{dto.Error}");
+                SetError($"{dto.AppError}");
             }
 
             if (existingStatus != null || dto.Status != null)
@@ -148,7 +148,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
             }
 
@@ -235,7 +235,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
 
                 // TODO ensure we are not override the error above. Can allow for multiple error messages.
                 var errors = await PopulateCreateViewModelSelectLists(vm, user.Id, activeOrg.ID, ct);
@@ -280,7 +280,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
             }
 
@@ -342,7 +342,7 @@ namespace VontaGenta.Controllers
 
                 if (!dto.IsSuccess)
                 {
-                    SetError(dto.Error);
+                    SetError(dto.AppError);
                     return RedirectToAction(nameof(List), new { vm.Year, vm.Month, vm.Page, vm.ItemsPerPage });
                 }
             }
@@ -376,7 +376,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(List), new { year, month, page, itemsPerPage });
             }
 
@@ -411,7 +411,7 @@ namespace VontaGenta.Controllers
 
             if (!deleteDto.IsSuccess)
             {
-                SetError(deleteDto.Error);
+                SetError(deleteDto.AppError);
             }
             else
             {
@@ -456,7 +456,7 @@ namespace VontaGenta.Controllers
 
             if (!getProjectsDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting projects: {0}", getProjectsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting projects: {0}", getProjectsDTO.AppError);
             }
             else
             {
@@ -467,7 +467,7 @@ namespace VontaGenta.Controllers
 
             if (!getCategoriesDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting categories: {0}", getProjectsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting categories: {0}", getProjectsDTO.AppError);
             }
             else
             {
@@ -478,7 +478,7 @@ namespace VontaGenta.Controllers
 
             if (!getCurrenciesDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting currencies: {0}", getCurrenciesDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting currencies: {0}", getCurrenciesDTO.AppError);
             }
             else
             {

@@ -23,7 +23,7 @@ namespace VontaGenta.Services
 
             if (string.IsNullOrEmpty(hcaptchaResponse))
             {
-                response.Error = "Invalid hCaptcha response.";
+                response.AppError = "Invalid hCaptcha response.";
                 return response;
             }
 
@@ -47,7 +47,7 @@ namespace VontaGenta.Services
             catch
             {
                 // TODO Log exception
-                response.Error = "Error on sending request to the hCaptcha end point.";
+                response.AppError = "Error on sending request to the hCaptcha end point.";
                 return response;
             }
 
@@ -63,14 +63,14 @@ namespace VontaGenta.Services
                 }
                 else
                 {
-                    response.Error = "Validation failed";
+                    response.AppError = "Validation failed";
                     return response;
                 }
             }
             catch
             {
                 // TODO Log exception
-                response.Error = "Error on reading the response.";
+                response.AppError = "Error on reading the response.";
                 return response;
             }
         }

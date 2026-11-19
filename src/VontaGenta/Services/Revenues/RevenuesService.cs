@@ -16,22 +16,22 @@ namespace VontaGenta.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetRevenuesDTO> GetRevenues(DateTime? date, string timeZoneId, string userId, int orgId, CancellationToken ct)
+        public async Task<GetRevenuesDTO> GetRevenues(DateTime? appDate, string timeZoneId, string userId, int orgId, CancellationToken ct)
         {
             var dto = new GetRevenuesDTO
             {
-                Date = date
+                AppDate = appDate
             };
 
-            if (dto.Date == null || dto.Date == DateTime.MinValue)
+            if (dto.AppDate == null || dto.AppDate == DateTime.MinValue)
             {
                 var todayUserTz = _appTimeZonesService.ConvertFromUtcToTimeZone(timeZoneId, DateTime.UtcNow);
                 // Use midnight on date. Not interested in time.
-                dto.Date = new DateTime(todayUserTz.Year, todayUserTz.Month, todayUserTz.Day, 0, 0, 0);
+                dto.AppDate = new DateTime(todayUserTz.Year, todayUserTz.Month, todayUserTz.Day, 0, 0, 0);
             }
 
             // Get any revenue on Date.
-            dto.List = (await _unitOfWork.Revenues.GetRevenuesAndRelatedFields(dto.Date.Value, userId, orgId, ct)).ToList();
+            dto.List = (await _unitOfWork.Revenues.GetRevenuesAndRelatedFields(dto.AppDate.Value, userId, orgId, ct)).ToList();
 
             return dto;
         }
@@ -42,13 +42,13 @@ namespace VontaGenta.Services
 
             if (id == null || id <= 0)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Revenues.CanGetRevenue(id.Value, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -56,7 +56,7 @@ namespace VontaGenta.Services
 
             if (dto.Revenue == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -69,13 +69,13 @@ namespace VontaGenta.Services
 
             if (id == null || id <= 0)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             if (!await _unitOfWork.Revenues.CanGetRevenue(id.Value, userId, ct))
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -83,14 +83,14 @@ namespace VontaGenta.Services
 
             if (dto.Revenue == null)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
             return dto;
         }
 
-        public GetRevenueDTO GetNewRevenue(string userId, string timeZoneId, DateTime? date)
+        public GetRevenueDTO GetNewRevenue(string userId, string timeZoneId, DateTime? appDate)
         {
             Revenue revenue;
 
@@ -100,9 +100,9 @@ namespace VontaGenta.Services
 
                 revenue.AppUserID = userId;
 
-                if (date != null)
+                if (appDate != null)
                 {
-                    revenue.EntryDate = date.Value;
+                    revenue.EntryDate = appDate.Value;
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace VontaGenta.Services
             }
             catch (Exception ex)
             {
-                return new GetRevenueDTO { Error = ex.Message };
+                return new GetRevenueDTO { AppError = ex.Message };
             }
 
             return new GetRevenueDTO { Revenue = revenue };
@@ -132,8 +132,8 @@ namespace VontaGenta.Services
 
                 if (errors.Any())
                 {
-                    dto.ErrorList = errors.GetErrors();
-                    dto.Error = "Error on save";
+                    dto.AppErrorList = errors.GetErrors();
+                    dto.AppError = "Error on save";
                     return dto;
                 }
 
@@ -149,7 +149,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Save failed";
+                    dto.AppError = "Save failed";
                     return dto;
                 }
             }
@@ -157,7 +157,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on save";
+                dto.AppError = "Error on save";
                 return dto;
             }
 
@@ -173,7 +173,7 @@ namespace VontaGenta.Services
             {
                 if (!await _unitOfWork.Revenues.CanGetRevenue(updatedRevenue.ID, userId, ct))
                 {
-                    dto.Error = "Error: Not found";
+                    dto.AppError = "Error: Not found";
                     return dto;
                 }
 
@@ -181,8 +181,8 @@ namespace VontaGenta.Services
 
                 if (errors.Any())
                 {
-                    dto.ErrorList = errors.GetErrors();
-                    dto.Error = "Error on update";
+                    dto.AppErrorList = errors.GetErrors();
+                    dto.AppError = "Error on update";
                     return dto;
                 }
 
@@ -198,7 +198,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Update failed";
+                    dto.AppError = "Update failed";
                     return dto;
                 }
             }
@@ -206,7 +206,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on update";
+                dto.AppError = "Error on update";
                 return dto;
             }
 
@@ -222,13 +222,13 @@ namespace VontaGenta.Services
             {
                 if (id == null || id <= 0)
                 {
-                    dto.Error = "Error: Not found";
+                    dto.AppError = "Error: Not found";
                     return dto;
                 }
 
                 if (!await _unitOfWork.Revenues.CanGetRevenue(id.Value, userId, ct))
                 {
-                    dto.Error = "Error: Not found";
+                    dto.AppError = "Error: Not found";
                     return dto;
                 }
 
@@ -244,7 +244,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
+                    dto.AppError = "Failed to delete item. There might be existing data associated to this item which is blocking the deletion.";
                     return dto;
                 }
             }
@@ -252,7 +252,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on delete";
+                dto.AppError = "Error on delete";
                 return dto;
             }
 

@@ -46,7 +46,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError($"{dto.Error}");
+                SetError($"{dto.AppError}");
             }
 
             if (existingStatus != null || dto.Status != null)
@@ -84,7 +84,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -166,7 +166,7 @@ namespace VontaGenta.Controllers
                     SetError(errors);
                 }
 
-                SetError(dto.Error);
+                SetError(dto.AppError);
             }
 
             return RedirectToAction(nameof(Index));
@@ -203,7 +203,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -238,7 +238,7 @@ namespace VontaGenta.Controllers
 
                     if (!dto.IsSuccess)
                     {
-                        SetError(dto.Error);
+                        SetError(dto.AppError);
                         return RedirectToAction(nameof(Index));
                     }
                 }
@@ -282,7 +282,7 @@ namespace VontaGenta.Controllers
 
             if (!dto.IsSuccess)
             {
-                SetError(dto.Error);
+                SetError(dto.AppError);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -311,7 +311,7 @@ namespace VontaGenta.Controllers
 
             if (!deleteDto.IsSuccess)
             {
-                SetError(deleteDto.Error);
+                SetError(deleteDto.AppError);
             }
 
             return RedirectToAction(nameof(Index));
@@ -325,7 +325,7 @@ namespace VontaGenta.Controllers
 
             if (!getClientsDTO.IsSuccess)
             {
-                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting clients: {0}", getClientsDTO.Error);
+                errors.AppendFormat(CultureInfo.InvariantCulture, "Error getting clients: {0}", getClientsDTO.AppError);
             }
             else
             {

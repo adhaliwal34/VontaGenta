@@ -43,7 +43,7 @@ namespace VontaGenta.Services
 
             if (!isOrgMemberDto.IsOrgMember)
             {
-                dto.Error = "Error: Not found";
+                dto.AppError = "Error: Not found";
                 return dto;
             }
 
@@ -61,7 +61,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to leave. There might be existing data associated to this org which is blocking leaving.";
+                    dto.AppError = "Failed to leave. There might be existing data associated to this org which is blocking leaving.";
                     return dto;
                 }
             }
@@ -69,7 +69,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on leaving org";
+                dto.AppError = "Error on leaving org";
                 return dto;
             }
 
@@ -94,7 +94,7 @@ namespace VontaGenta.Services
                 else
                 {
                     await _unitOfWork.RollbackAsync(ct);
-                    dto.Error = "Failed to set active org.";
+                    dto.AppError = "Failed to set active org.";
                     return dto;
                 }
             }
@@ -102,7 +102,7 @@ namespace VontaGenta.Services
             {
                 await _unitOfWork.RollbackAsync(ct);
                 //TODO log error
-                dto.Error = "Error on setting active org";
+                dto.AppError = "Error on setting active org";
                 return dto;
             }
 
@@ -118,13 +118,13 @@ namespace VontaGenta.Services
                 dto.Org = await _unitOfWork.UserOrgs.GetActiveOrg(userId, ct);
                 if (dto.Org == null)
                 {
-                    dto.Error = "Active org not found";
+                    dto.AppError = "Active org not found";
                 }
             }
             catch
             {
                 // TODO log error
-                dto.Error = "Error getting active org";
+                dto.AppError = "Error getting active org";
             }
 
             return dto;
