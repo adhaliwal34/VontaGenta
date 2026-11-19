@@ -51,11 +51,11 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Category?> GetCategory(int id, CancellationToken ct)
+        public async Task<Category?> GetCategory(int categoryId, CancellationToken ct)
         {
             try
             {
-                var parameters = new { Id = id };
+                var parameters = new { Id = categoryId };
                 var sql = @"SELECT
                             costcategories.*
                             ,orgs.*

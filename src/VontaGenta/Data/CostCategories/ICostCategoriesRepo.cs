@@ -7,7 +7,7 @@ namespace VontaGenta.Data
     {
         Task<int> DeleteCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null);
         Task<List<Category>> GetCategoriesForMemberOrg(string userId, int orgId, CancellationToken ct);
-        Task<Category?> GetCategory(int orgId, CancellationToken ct);
+        Task<Category?> GetCategory(int categoryId, CancellationToken ct);
         Task<int> SaveCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null);
         Task<int> UpdateCategory(Category category, CancellationToken ct, NpgsqlTransaction? tx = null);
         Task<bool> AllowGetCostCategory(int categoryId, string userId, CancellationToken ct);
