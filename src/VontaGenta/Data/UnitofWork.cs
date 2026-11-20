@@ -144,6 +144,8 @@ namespace VontaGenta.Data
             {
                 await _connection.DisposeAsync();
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }
