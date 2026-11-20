@@ -24,9 +24,10 @@ See [CLAUDE.md](CLAUDE.md) for a fuller description.
 Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
 1. Set up Postgres (an example is given below).
-2. Load the schema from [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseBackups/vonta_genta_db_schema.sql`.
-3. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
-4. Run the app:
+2. Load the schema from [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseSetup/vonta_genta_db_schema.sql`.
+3. Load the seed data from [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseSetup/vonta_genta_db_seed.sql`.
+4. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
+5. Run the app:
 
    ```bash
    dotnet run --project src/VontaGenta/VontaGenta.csproj

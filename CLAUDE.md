@@ -15,7 +15,8 @@ ASP.NET Core MVC app on .NET 10 (SDK pinned in [global.json](global.json)) with 
 
 Linting uses the Roslyn analyzers, configured by `AnalysisLevel` and `EnforceCodeStyleInBuild` in [VontaGenta.csproj](src/VontaGenta/VontaGenta.csproj) and by [.editorconfig](.editorconfig). Analyzer findings show up as warnings in `dotnet build`, so check it for new ones. `Migrations` and `Areas/Identity` are marked as generated code and skipped. CA1848 (LoggerMessage delegates) is turned off on purpose. Line endings are LF (`.gitattributes` and `.editorconfig`), apart from `.sln`, `.bat` and `.cmd`, which are CRLF.
 
-The database schema is kept in [DatabaseBackups/vonta_genta_db_schema.sql](DatabaseBackups/vonta_genta_db_schema.sql).
+The database schema is kept in [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql).
+The database seed data is kept in [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql).
 
 ## Architecture
 
