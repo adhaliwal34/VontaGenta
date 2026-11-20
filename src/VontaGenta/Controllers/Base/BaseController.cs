@@ -47,10 +47,10 @@ namespace VontaGenta.Controllers
             return (string?)TempData.Peek("ErrorMessage") != null;
         }
 
-        protected float GetSystemVersion(IConfiguration _config)
+        protected float GetSystemVersion(IConfiguration config)
         {
             float sysVerFloat = 0f;
-            var sysVer = _config["SystemVersion"];
+            var sysVer = config["SystemVersion"];
 
             if (string.IsNullOrEmpty(sysVer))
             {
