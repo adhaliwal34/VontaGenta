@@ -134,7 +134,7 @@ namespace VontaGenta.ViewHelpers
             return selectList;
         }
 
-        private void SetNullValue(object? selectedValue, bool? isNullable, SelectList selectList)
+        private static void SetNullValue(object? selectedValue, bool? isNullable, SelectList selectList)
         {
             if (selectedValue == null && isNullable == true)
             {

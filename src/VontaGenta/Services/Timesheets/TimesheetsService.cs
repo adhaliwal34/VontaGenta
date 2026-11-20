@@ -52,7 +52,7 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        private void PopulateTotalTimePerProject(Dictionary<string, TimeSpan> totalTime, Timesheet timesheet, TimeSpan taskDuration)
+        private static void PopulateTotalTimePerProject(Dictionary<string, TimeSpan> totalTime, Timesheet timesheet, TimeSpan taskDuration)
         {
             var projectIdName = $"{timesheet.Project?.ID}:{timesheet.Project?.Name}";
 
