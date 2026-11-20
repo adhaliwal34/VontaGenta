@@ -35,7 +35,7 @@ namespace VontaGenta.Data
 
             try
             {
-                email = email.ToUpper();
+                email = _userManager.NormalizeName(email);
                 var connectionString = _config["ConnectionStrings:ApplicationDbContext"];
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
