@@ -1,6 +1,5 @@
 -- Postgres schema for vonta_genta_db
--- Create the database first, then run this script against it:
---   CREATE DATABASE vonta_genta_db WITH ENCODING 'UTF8';
+-- See README.md for instructions 
 
 BEGIN;
 
