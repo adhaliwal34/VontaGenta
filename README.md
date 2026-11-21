@@ -48,11 +48,11 @@ These are the steps for creating a Postgres DB in a docker container in a Ubuntu
    POSTGRES_PASSWORD=<choose-a-password>
    ```
 
-4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 3 of the "Getting started" section above. This init script only runs once, when the data volume is empty.
+4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 4 of the "Getting started" section above. This init script only runs once, when the data volume is empty.
 
    ```sql
    -- Create the application database
-   CREATE DATABASE vonta_genta_db;
+   CREATE DATABASE vonta_genta_db WITH ENCODING 'UTF8';
 
    -- Create the application user (non-superuser)
    CREATE USER vonta_genta_db_user WITH PASSWORD '<choose-a-password>';
@@ -74,6 +74,14 @@ These are the steps for creating a Postgres DB in a docker container in a Ubuntu
    ```
 
 The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. Restrict access with a firewall rule or bind to a specific IP if the VM is reachable beyond your machine.
+
+6. From the host machine move the [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql) and [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql) files into the VM file directory. If using Vagrant to set up the VM, these files can be moved to the directory that is mapped to the VM.
+
+7. SSH to the VM and execute this command to create the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < ~/vagrant/vonta_genta_db_schema.sql`
+
+8. SSH to the VM and execute this command to seed the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < ~/vagrant/vonta_genta_db_seed.sql`
+
+9. Continue from step 4 of the "Getting started" section above.
 
 ## Tests
 
