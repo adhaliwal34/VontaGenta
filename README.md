@@ -70,16 +70,16 @@ These are the steps for creating a Postgres DB in a docker container in a Ubuntu
 5. From that directory, run the container:
 
    ```bash
-   sudo docker run --name vonta_postgres      --env-file .env      -v $(pwd)/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql      -v pg_data:/var/lib/postgresql/data      -p 5432:5432      --restart always      -d postgres:17
+   sudo docker run --name vonta_postgres      --env-file .env      -v $(pwd)/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql      -v pg_data:/var/lib/postgresql     -p 5432:5432      --restart always      -d postgres:18
    ```
 
 The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. Restrict access with a firewall rule or bind to a specific IP if the VM is reachable beyond your machine.
 
 6. From the host machine move the [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql) and [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql) files into the VM file directory. If using Vagrant to set up the VM, these files can be moved to the directory that is mapped to the VM.
 
-7. SSH to the VM and execute this command to create the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < ~/vagrant/vonta_genta_db_schema.sql`
+7. SSH to the VM and execute this command to create the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < /vagrant/vonta_genta_db_schema.sql`
 
-8. SSH to the VM and execute this command to seed the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < ~/vagrant/vonta_genta_db_seed.sql`
+8. SSH to the VM and execute this command to seed the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < /vagrant/vonta_genta_db_seed.sql`
 
 9. Continue from step 4 of the "Getting started" section above.
 
