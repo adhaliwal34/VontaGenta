@@ -24,64 +24,66 @@ See [CLAUDE.md](CLAUDE.md) for a fuller description.
 Prerequisites: the .NET SDK pinned in [global.json](global.json) and PostgreSQL.
 
 1. Set up Postgres (an example is given below).
-2. Load the schema from [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseSetup/vonta_genta_db_schema.sql`.
-3. Load the seed data from [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql) into the Postgres DB, for example `psql -h <host> -U vonta_genta_db_user -d vonta_genta_db -f DatabaseSetup/vonta_genta_db_seed.sql`.
-4. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string, AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
-5. Run the app:
+2. Copy `src/VontaGenta/appsettings.example.json` to `src/VontaGenta/appsettings.json` (and `appsettings.Development.json` if you want) and fill in your connection string (using the `vonta_genta_app_user` and its password), AWS SES credentials and hCaptcha secret. These files are gitignored, so keep secrets out of tracked files.
+3. Run the app:
 
    ```bash
    dotnet run --project src/VontaGenta/VontaGenta.csproj
    ```
 
-Registration is controlled by the `RegistrationEnabled` setting.
+Registration is controlled by the `RegistrationEnabled` setting. No user is registered on initial start up.
 
 ### Example Postgres setup
 
-These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM. Any working Postgres instance will do. This is the setup AJ uses.
+These are the steps for creating a Postgres DB in a docker container in a Ubuntu VM that is run using VirtualBox and Vagrant. Any working Postgres instance will do. This is the setup AJ uses.
 
-1. SSH to the VM.
-2. Create a docker volume so that data is retained after container shutdown and restart: `sudo docker volume create pg_data`
-3. In one directory, create the `.env` file. Do not commit it.
+1. Copy the file `DatabaseSetup/.env.example` to `DatabaseSetup/.env` and add your chosen passwords.
+2. Map the folder `DatabaseSetup` to the folder `/vonta-db-setup` in the VM by adding these lines to the Vagrantfile
 
-   ```text
-   POSTGRES_USER=postgres
-   POSTGRES_PASSWORD=<choose-a-password>
+   ```ruby
+   Vagrant.configure("2") do |config|
+     # ... existing config ...
+     config.vm.synced_folder "<path to folder>/DatabaseSetup",
+                             "/vonta-db-setup"
+   end
    ```
 
-4. In the same directory, create the `init-db.sql` file. Use its DB name, user name and password in the connection string in step 4 of the "Getting started" section above. This init script only runs once, when the data volume is empty.
-
-   ```sql
-   -- Create the application database
-   CREATE DATABASE vonta_genta_db WITH ENCODING 'UTF8';
-
-   -- Create the application user (non-superuser)
-   CREATE USER vonta_genta_db_user WITH PASSWORD '<choose-a-password>';
-
-   -- Grant privileges on the database
-   GRANT ALL PRIVILEGES ON DATABASE vonta_genta_db TO vonta_genta_db_user;
-
-   -- Connect to the app database to configure schema permissions
-   \c vonta_genta_db
-
-   -- Ensure user can create tables in the public schema
-   GRANT ALL ON SCHEMA public TO vonta_genta_db_user;
-   ```
-
-5. From that directory, run the container:
+3. Start the VM by changing directory to the folder with the Vagrantfile and using `vagrant up`.
+4. SSH to the VM using `vagrant ssh`
+5. Create a docker volume so that data is retained after container shutdown and restart: `sudo docker volume create pg_data`
+6. Start the container:
 
    ```bash
-   sudo docker run --name vonta_postgres      --env-file .env      -v $(pwd)/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql      -v pg_data:/var/lib/postgresql     -p 5432:5432      --restart always      -d postgres:18
+   sudo docker run --name vonta_postgres --env-file /vonta-db-setup/.env \
+     -v /vonta-db-setup/01-init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro \
+     -v /vonta-db-setup/02-schema-and-seed.sql:/docker-entrypoint-initdb.d/02-schema-and-seed.sql:ro \
+     -v /vonta-db-setup/03-app-user.sql:/docker-entrypoint-initdb.d/03-app-user.sql:ro \
+     -v /vonta-db-setup/vonta_genta_db_schema.sql:/vonta-sql/vonta_genta_db_schema.sql:ro \
+     -v /vonta-db-setup/vonta_genta_db_seed.sql:/vonta-sql/vonta_genta_db_seed.sql:ro \
+     -v pg_data:/var/lib/postgresql \
+     -p 5432:5432 --restart always -d postgres:18
    ```
 
 The `-p 5432:5432` option exposes Postgres to all the VM's network interfaces. Restrict access with a firewall rule or bind to a specific IP if the VM is reachable beyond your machine.
 
-6. From the host machine move the [DatabaseSetup/vonta_genta_db_schema.sql](DatabaseSetup/vonta_genta_db_schema.sql) and [DatabaseSetup/vonta_genta_db_seed.sql](DatabaseSetup/vonta_genta_db_seed.sql) files into the VM file directory. If using Vagrant to set up the VM, these files can be moved to the directory that is mapped to the VM.
+7. Run `sudo docker logs vonta_postgres | grep "PostgreSQL init process complete"` and look for the line "PostgreSQL init process complete". If the line is missing, check the rest of the output from `sudo docker logs vonta_postgres` and fix any errors raised. Delete the docker container and volume before trying again. See step 3 in "Example of starting with a clean Postgres db" for how to do this. Continue from step 5 of this section.
 
-7. SSH to the VM and execute this command to create the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < /vagrant/vonta_genta_db_schema.sql`
+8. Continue from step 2 of the "Getting started" section above.
 
-8. SSH to the VM and execute this command to seed the tables (assumes files copied to /vagrant folder): `sudo docker exec -i vonta_postgres psql -U vonta_genta_db_user -d vonta_genta_db < /vagrant/vonta_genta_db_seed.sql`
+### Example of starting with a clean Postgres db
 
-9. Continue from step 4 of the "Getting started" section above.
+If you already have a Postgres db set up as described in the "Example Postgres setup" section and you want a fresh db, follow these instructions.
+
+1. Start the VM using `vagrant up`
+2. SSH to the VM using `vagrant ssh`
+3. Execute the following lines to stop the existing docker container, delete it, and delete the volume
+
+   ```bash
+   sudo docker stop vonta_postgres
+   sudo docker rm vonta_postgres
+   sudo docker volume rm pg_data
+   ```
+4. Continue from step 5 of the "Example Postgres setup" section.
 
 ## Tests
 
