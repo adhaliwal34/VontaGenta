@@ -319,7 +319,7 @@ namespace VontaGenta.Controllers
 
         private async Task<string?> PopulateCreateViewModelLists(ProjectFormViewModel vm, string userId, int orgId, CancellationToken ct)
         {
-            var getClientsDTO = await _clientsService.GetClientsForMemberOrg(orgId, userId, ct);
+            var getClientsDTO = await _clientsService.GetClientsForOrg(orgId, userId, ct);
 
             var errors = new StringBuilder();
 
