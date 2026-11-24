@@ -15,11 +15,22 @@ namespace VontaGenta.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetClientsDTO> GetClientsForMemberOrg(int orgId, string userId, CancellationToken ct)
+        public async Task<GetClientsDTO> GetClientsForOrg(int orgId, string userId, CancellationToken ct)
         {
             var dto = new GetClientsDTO();
 
-            dto.List = await _unitOfWork.Clients.GetClientsForMemberOrg(orgId, userId, ct);
+            await _unitOfWork.BeginTransactionAsync(orgId, IsolationLevel.ReadCommitted, ct);
+
+            try
+            {
+                dto.List = await _unitOfWork.Clients.GetClientsForOrg(orgId, userId, ct);
+                await _unitOfWork.CommitAsync(ct);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackAsync(ct);
+                dto.AppError = "Error on getting clients";
+            }
 
             return dto;
         }

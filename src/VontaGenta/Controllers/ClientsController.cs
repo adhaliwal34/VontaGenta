@@ -37,7 +37,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _clientsService.GetClientsForMemberOrg(activeOrg.ID, user.Id, ct);
+            var dto = await _clientsService.GetClientsForOrg(activeOrg.ID, user.Id, ct);
 
             if (!dto.IsSuccess)
             {

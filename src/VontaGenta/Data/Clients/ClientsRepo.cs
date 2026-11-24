@@ -16,27 +16,14 @@ namespace VontaGenta.Data
             Logger.LogInformation("ClientsRepo instantiated");
         }
 
-        /*
-         * Get the clients created for an org the user is a member of.
-         * If they created a client for an org but now are no longer
-         * a member of the org, do not show that client.
-         *
-         * Note, the permissions for which clients a user can see are
-         * hard-coded into the SQL.
-         *
-         * Are the permissions actually hard-coded? The method is just doing
-         * its job of getting clients for an org the user is a member of.
-         * It's just another method for lower layers to call. It doesn't specify
-         * that this is the only permission that must be checked. More can be
-         * written.
-         *
-        */
-        public async Task<List<Client>> GetClientsForMemberOrg(int orgId, string userId, CancellationToken ct)
+        public async Task<List<Client>> GetClientsForOrg(int orgId, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
 
             try
             {
-                var parameters = new { AppUserId = userId, OrgId = orgId };
+                var tran = tx ?? Transaction;
+
+                var parameters = new { OrgId = orgId };
                 var sql = @"SELECT
                         clients.*
                         ,aspnetusers.*
@@ -44,15 +31,14 @@ namespace VontaGenta.Data
                         FROM clients
                         INNER JOIN aspnetusers ON aspnetusers.id = clients.appuserid
                         INNER JOIN orgs ON orgs.id = clients.orgid
-                        INNER JOIN userorgs ON userorgs.orgid = clients.orgid
-                        WHERE userorgs.appuserid = @AppUserId
-                            AND orgs.id = @OrgID
+                        WHERE clients.orgid = @OrgID
                         ORDER BY orgs.name, clients.name;";
 
                 var command = new CommandDefinition(
                                     sql,
                                     parameters,
-                                    cancellationToken: ct
+                                    cancellationToken: ct,
+                                    transaction: tran
                                 );
 
                 return (await Connection.QueryAsync<Client, AppUser, Org, Client>(command, (client, appUser, org) =>
@@ -65,44 +51,7 @@ namespace VontaGenta.Data
             catch (Exception ex)
             {
                 Logger.LogError("Error: {Exception}", ex);
-                return new List<Client>();
-            }
-        }
-
-        // Does not check for membership of org.
-        public async Task<List<Client>> GetClientsForOrg(int orgId, CancellationToken ct)
-        {
-            try
-            {
-                var parameters = new { OrgID = orgId };
-                var sql = @"SELECT
-                        clients.*
-                        ,aspnetusers.*
-                        ,orgs.*
-                        FROM clients
-                        INNER JOIN aspnetusers ON aspnetusers.id = clients.appuserid
-                        INNER JOIN orgs ON clients.orgid = orgs.id
-                        WHERE clients.orgid = @OrgID
-                        ORDER BY orgs.name, clients.name;";
-
-                var command = new CommandDefinition(
-                    sql,
-                    parameters,
-                    cancellationToken: ct
-                );
-
-                return (await Connection.QueryAsync<Client, AppUser, Org, Client>(command, (client, appUser, org) =>
-                {
-                    client.User = appUser;
-                    client.Org = org;
-                    return client;
-                })).ToList();
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error: {Exception}", ex);
-                return new List<Client>();
+                throw;
             }
         }
 
