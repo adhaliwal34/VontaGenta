@@ -1,4 +1,5 @@
 using System.Data;
+using Dapper;
 using Npgsql;
 
 namespace VontaGenta.Data
@@ -98,6 +99,17 @@ namespace VontaGenta.Data
                 throw new InvalidOperationException("Transaction already started.");
 
             _transaction = await _connection.BeginTransactionAsync(level, ct);
+        }
+
+        public async Task BeginTransactionAsync(
+                int orgId,
+                IsolationLevel level = IsolationLevel.ReadCommitted,
+                CancellationToken ct = default)
+        {
+            await BeginTransactionAsync(level, ct);
+            await Connection.ExecuteAsync(new CommandDefinition(
+                "SELECT set_config('app.orgid', @OrgId::text, true);",
+                new { OrgId = orgId }, transaction: _transaction, cancellationToken: ct));
         }
 
         public async Task CommitAsync(CancellationToken ct = default)
