@@ -234,4 +234,3 @@ namespace VontaGenta.Data
 
     }
 }
-// cSpell:ignore tran

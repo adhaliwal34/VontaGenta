@@ -368,4 +368,3 @@ namespace VontaGenta.Data
         #endregion
     }
 }
-// cSpell:ignore tran
