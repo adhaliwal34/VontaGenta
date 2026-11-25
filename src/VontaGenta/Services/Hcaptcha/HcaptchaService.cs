@@ -77,4 +77,3 @@ namespace VontaGenta.Services
 
     }
 }
-// cSpell:ignore hcaptcha newtonsoft
