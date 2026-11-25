@@ -93,5 +93,3 @@ app.MapRazorPages();
 Console.WriteLine("Running app now...");
 
 app.Run();
-
-// cSpell:ignore serilog hcaptcha npgsql
