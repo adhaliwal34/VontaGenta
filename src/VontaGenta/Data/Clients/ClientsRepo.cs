@@ -55,13 +55,13 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Client?> GetClient(int id, CancellationToken ct, NpgsqlTransaction? tx = null)
+        public async Task<Client?> GetClient(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { Id = id };
+                var parameters = new { Id = clientId };
                 var sql = @"SELECT
                             clients.*
                             FROM clients
@@ -83,13 +83,13 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Client?> GetClientAndRelatedFields(int id, CancellationToken ct, NpgsqlTransaction? tx = null)
+        public async Task<Client?> GetClientAndRelatedFields(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { Id = id };
+                var parameters = new { Id = clientId };
                 var sql = @"SELECT
                             clients.*
                             ,orgs.*
@@ -196,19 +196,20 @@ namespace VontaGenta.Data
                     EntityID = client.ID,
                     Action = AppActions.Edit,
                     EntryTimestamp = DateTime.UtcNow,
-                    AppUserID = userId,
-                    Json = JsonConvert.SerializeObject(client)
+                    AppUserID = userId
                 };
 
-                var parameters = new { client.ID, client.Name, client.Description, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var parameters = new { client.ID, client.Name, client.Description, dataLog.EntityName, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID };
                 var sql = @"WITH u AS (
                                 UPDATE clients
                                 SET name = @Name, description = @Description
                                 WHERE id = @ID
-                                RETURNING id
+                                RETURNING id, name, description, orgid, appuserid
                             )
                             INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
-                            SELECT @EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json
+                            SELECT @EntityName, u.id, @Action, @EntryTimestamp, @AppUserID,
+                                   json_build_object('ID', u.id, 'Name', u.name, 'Description', u.description,
+                                                     'OrgID', u.orgid, 'AppUserID', u.appuserid)::text
                             FROM u;";
 
                 var command = new CommandDefinition(
@@ -243,7 +244,7 @@ namespace VontaGenta.Data
                 };
 
                 // Using Postgres's json_build_object() as we do not have a client object to serialise.
-                var parameters = new { clientId, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var parameters = new { ID = clientId, dataLog.EntityName, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID };
                 var sql = @"WITH d AS (
                                 DELETE FROM clients WHERE id = @ID
                                 RETURNING id, name, description, orgid, appuserid

@@ -6,8 +6,8 @@ namespace VontaGenta.Data
     public interface IClientsRepo
     {
         Task<List<Client>> GetClientsForOrg(int activeOrgId, string userId, CancellationToken ct, NpgsqlTransaction? tx = null);
-        Task<Client?> GetClient(int id, CancellationToken ct, NpgsqlTransaction? tx = null);
-        Task<Client?> GetClientAndRelatedFields(int id, CancellationToken ct, NpgsqlTransaction? tx = null);
+        Task<Client?> GetClient(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null);
+        Task<Client?> GetClientAndRelatedFields(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null);
         Task<int> SaveClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null);
         Task<int> UpdateClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null);
 
