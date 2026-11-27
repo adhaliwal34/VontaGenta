@@ -15,15 +15,15 @@ namespace VontaGenta.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetClientsDTO> GetClientsForOrg(int orgId, string userId, CancellationToken ct)
+        public async Task<GetClientsDTO> GetClientsForOrg(int activeOrgId, string userId, CancellationToken ct)
         {
             var dto = new GetClientsDTO();
 
-            await _unitOfWork.BeginTransactionAsync(orgId, IsolationLevel.ReadCommitted, ct);
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
             try
             {
-                dto.List = await _unitOfWork.Clients.GetClientsForOrg(orgId, userId, ct);
+                dto.List = await _unitOfWork.Clients.GetClientsForOrg(activeOrgId, userId, ct);
                 await _unitOfWork.CommitAsync(ct);
             }
             catch (Exception)
@@ -35,49 +35,35 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<GetClientDTO> GetClient(int id, string userId, CancellationToken ct)
+        public async Task<GetClientDTO> GetClientAndRelatedFields(int activeOrgId, int id, CancellationToken ct)
         {
             var dto = new GetClientDTO();
 
-            if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
+
+            try
             {
-                dto.AppError = "Error: Not found";
-                return dto;
+                dto.Client = await _unitOfWork.Clients.GetClientAndRelatedFields(id, ct);
+
+                if (dto.Client == null)
+                {
+                    await _unitOfWork.CommitAsync(ct);
+                    dto.AppError = "Error: Not found";
+                    return dto;
+                }
+
+                await _unitOfWork.CommitAsync(ct);
             }
-
-            dto.Client = await _unitOfWork.Clients.GetClient(id, ct);
-
-            if (dto.Client == null)
+            catch (Exception)
             {
-                dto.AppError = "Error: Not found";
-                return dto;
+                await _unitOfWork.RollbackAsync(ct);
+                dto.AppError = "Error on getting client";
             }
 
             return dto;
         }
 
-        public async Task<GetClientDTO> GetClientAndRelatedFields(int id, string userId, CancellationToken ct)
-        {
-            var dto = new GetClientDTO();
-
-            if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
-            {
-                dto.AppError = "Error: Not found";
-                return dto;
-            }
-
-            dto.Client = await _unitOfWork.Clients.GetClientAndRelatedFields(id, ct);
-
-            if (dto.Client == null)
-            {
-                dto.AppError = "Error: Not found";
-                return dto;
-            }
-
-            return dto;
-        }
-
-        public async Task<SaveClientDTO> SaveClient(Client client, string userId, CancellationToken ct)
+        public async Task<SaveClientDTO> SaveClient(int activeOrgId, Client client, string userId, CancellationToken ct)
         {
             var dto = new SaveClientDTO();
 
@@ -87,13 +73,7 @@ namespace VontaGenta.Services
                 return dto;
             }
 
-            if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(client, userId, ct))
-            {
-                dto.AppError = "Error: action not allowed";
-                return dto;
-            }
-
-            await _unitOfWork.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct);
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
             try
             {
@@ -114,7 +94,6 @@ namespace VontaGenta.Services
             catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
-                //TODO log error
                 dto.AppError = "Error on save";
                 return dto;
             }
@@ -122,33 +101,37 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<UpdateClientDTO> UpdateClient(Client client, string userId, CancellationToken ct)
+        public async Task<UpdateClientDTO> UpdateClient(int activeOrgId, Client client, string userId, CancellationToken ct)
         {
             var dto = new UpdateClientDTO();
 
-            if (!await _unitOfWork.Clients.AllowGetClient(client.ID, userId, ct))
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
+
+            Client? storedClient;
+
+            try
             {
-                dto.AppError = "Error: Not found";
-                return dto;
+                storedClient = await _unitOfWork.Clients.GetClient(client.ID, ct);
+
+                if (storedClient == null)
+                {
+                    await _unitOfWork.CommitAsync(ct);
+                    dto.AppError = "Error: Not found";
+                    return dto;
+                }
+
+                await _unitOfWork.CommitAsync(ct);
             }
-
-            var storedClient = await _unitOfWork.Clients.GetClient(client.ID, ct);
-
-            if (storedClient == null)
+            catch (Exception)
             {
-                dto.AppError = "Error: Not found";
+                await _unitOfWork.RollbackAsync(ct);
+                dto.AppError = "Error: Error on update";
                 return dto;
             }
 
             client.MapTo(storedClient);
 
-            if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(storedClient, userId, ct))
-            {
-                dto.AppError = "Error: action not allowed";
-                return dto;
-            }
-
-            await _unitOfWork.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct);
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
             try
             {
@@ -169,7 +152,6 @@ namespace VontaGenta.Services
             catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
-                // TODO log error
                 dto.AppError = "Error: Error on update";
                 return dto;
             }
@@ -177,31 +159,35 @@ namespace VontaGenta.Services
             return dto;
         }
 
-        public async Task<DeleteClientDTO> DeleteClient(int id, string userId, CancellationToken ct)
+        public async Task<DeleteClientDTO> DeleteClient(int activeOrgId, int id, string userId, CancellationToken ct)
         {
             var dto = new DeleteClientDTO();
 
-            if (!await _unitOfWork.Clients.AllowGetClient(id, userId, ct))
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
+
+            Client? client;
+
+            try
             {
-                dto.AppError = "Error: Not found";
+                client = await _unitOfWork.Clients.GetClient(id, ct);
+
+                if (client == null)
+                {
+                    await _unitOfWork.CommitAsync(ct);
+                    dto.AppError = "Error: Not found";
+                    return dto;
+                }
+
+                await _unitOfWork.CommitAsync(ct);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackAsync(ct);
+                dto.AppError = "Error: Error on delete";
                 return dto;
             }
 
-            var client = await _unitOfWork.Clients.GetClient(id, ct);
-
-            if (client == null)
-            {
-                dto.AppError = "Error: Not found";
-                return dto;
-            }
-
-            if (!await _unitOfWork.Clients.AllowUpdateOrCreateClient(client, userId, ct))
-            {
-                dto.AppError = "Error: action not allowed";
-                return dto;
-            }
-
-            await _unitOfWork.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct);
+            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
             try
             {
@@ -222,8 +208,7 @@ namespace VontaGenta.Services
             catch (Exception)
             {
                 await _unitOfWork.RollbackAsync(ct);
-                // TODO log error
-                dto.AppError = "Error: Error on update";
+                dto.AppError = "Error: Error on delete";
                 return dto;
             }
 

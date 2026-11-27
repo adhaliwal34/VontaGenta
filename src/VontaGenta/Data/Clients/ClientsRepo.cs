@@ -16,14 +16,14 @@ namespace VontaGenta.Data
             Logger.LogInformation("ClientsRepo instantiated");
         }
 
-        public async Task<List<Client>> GetClientsForOrg(int orgId, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
+        public async Task<List<Client>> GetClientsForOrg(int activeOrgId, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
 
             try
             {
                 var tran = tx ?? Transaction;
 
-                var parameters = new { OrgId = orgId };
+                var parameters = new { OrgId = activeOrgId };
                 var sql = @"SELECT
                         clients.*
                         ,aspnetusers.*
@@ -55,10 +55,12 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Client?> GetClient(int id, CancellationToken ct)
+        public async Task<Client?> GetClient(int id, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
+                var tran = tx ?? Transaction;
+
                 var parameters = new { Id = id };
                 var sql = @"SELECT
                             clients.*
@@ -68,7 +70,8 @@ namespace VontaGenta.Data
                 var command = new CommandDefinition(
                     sql,
                     parameters,
-                    cancellationToken: ct
+                    cancellationToken: ct,
+                    transaction: tran
                 );
 
                 return (await Connection.QueryAsync<Client>(command)).FirstOrDefault();
@@ -76,15 +79,16 @@ namespace VontaGenta.Data
             catch (Exception ex)
             {
                 Logger.LogError("Error: {Exception}", ex);
-                return null;
+                throw;
             }
         }
 
-        // TODO currently only client creator can get the client.
-        public async Task<Client?> GetClientAndRelatedFields(int id, CancellationToken ct)
+        public async Task<Client?> GetClientAndRelatedFields(int id, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
             {
+                var tran = tx ?? Transaction;
+
                 var parameters = new { Id = id };
                 var sql = @"SELECT
                             clients.*
@@ -98,7 +102,8 @@ namespace VontaGenta.Data
                 var command = new CommandDefinition(
                     sql,
                     parameters,
-                    cancellationToken: ct
+                    cancellationToken: ct,
+                    transaction: tran
                 );
 
                 return (await Connection.QueryAsync<Client, Org, AppUser, Client>(command, (client, org, appUser) =>
@@ -111,7 +116,7 @@ namespace VontaGenta.Data
             catch (Exception ex)
             {
                 Logger.LogError("Error: {Exception}", ex);
-                return null;
+                throw;
             }
         }
 
@@ -195,9 +200,9 @@ namespace VontaGenta.Data
                     Json = JsonConvert.SerializeObject(client)
                 };
 
-                var parameters = new { client.ID, client.Name, client.Description, client.OrgID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var parameters = new { client.ID, client.Name, client.Description, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
                 var sql = @"UPDATE clients
-                            SET name = @Name, description = @Description, orgid = @OrgID
+                            SET name = @Name, description = @Description
                             WHERE clients.id = @ID;
 
                             INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
@@ -265,62 +270,5 @@ namespace VontaGenta.Data
                 return 0;
             }
         }
-
-        #region Permissions
-
-        public async Task<bool> AllowGetClient(int clientId, string userId, CancellationToken ct)
-        {
-            try
-            {
-                var parameters = new { ClientId = clientId, AppUserId = userId };
-                var sql = @"SELECT
-                                true
-                                FROM clients
-                                INNER JOIN userorgs ON userorgs.orgid = clients.orgid
-                                WHERE userorgs.appuserid = @AppUserId
-								    AND clients.id = @ClientId;";
-
-                var command = new CommandDefinition(
-                    sql,
-                    parameters,
-                    cancellationToken: ct
-                );
-
-                return (await Connection.QueryAsync<bool>(command)).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error: {Exception}", ex);
-                return false;
-            }
-        }
-
-        public async Task<bool> AllowUpdateOrCreateClient(Client client, string userId, CancellationToken ct)
-        {
-            try
-            {
-                var parameters = new { AppUserId = userId, OrgId = client.OrgID };
-                var sql = @"SELECT
-                                true
-                                FROM userorgs
-                                WHERE userorgs.appuserid = @AppUserId
-                                    AND userorgs.orgid = @OrgId;";
-
-                var command = new CommandDefinition(
-                    sql,
-                    parameters,
-                    cancellationToken: ct
-                );
-
-                return (await Connection.QueryAsync<bool>(command)).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error: {Exception}", ex);
-                return false;
-            }
-        }
-
-        #endregion
     }
 }
