@@ -55,34 +55,6 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<Client?> GetClient(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null)
-        {
-            try
-            {
-                var tran = tx ?? Transaction;
-
-                var parameters = new { Id = clientId };
-                var sql = @"SELECT
-                            clients.*
-                            FROM clients
-                            WHERE clients.id = @Id;";
-
-                var command = new CommandDefinition(
-                    sql,
-                    parameters,
-                    cancellationToken: ct,
-                    transaction: tran
-                );
-
-                return (await Connection.QueryAsync<Client>(command)).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error: {Exception}", ex);
-                throw;
-            }
-        }
-
         public async Task<Client?> GetClientAndRelatedFields(int clientId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
             try
@@ -193,7 +165,6 @@ namespace VontaGenta.Data
                 var dataLog = new DataLog
                 {
                     EntityName = EntityName,
-                    EntityID = client.ID,
                     Action = AppActions.Edit,
                     EntryTimestamp = DateTime.UtcNow,
                     AppUserID = userId
@@ -237,7 +208,6 @@ namespace VontaGenta.Data
                 var dataLog = new DataLog
                 {
                     EntityName = EntityName,
-                    EntityID = clientId,
                     Action = AppActions.Delete,
                     EntryTimestamp = DateTime.UtcNow,
                     AppUserID = userId
