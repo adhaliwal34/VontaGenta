@@ -201,12 +201,15 @@ namespace VontaGenta.Data
                 };
 
                 var parameters = new { client.ID, client.Name, client.Description, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
-                var sql = @"UPDATE clients
-                            SET name = @Name, description = @Description
-                            WHERE clients.id = @ID;
-
+                var sql = @"WITH u AS (
+                                UPDATE clients
+                                SET name = @Name, description = @Description
+                                WHERE id = @ID
+                                RETURNING id
+                            )
                             INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
-                            VALUES (@EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json);";
+                            SELECT @EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json
+                            FROM u;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -215,9 +218,7 @@ namespace VontaGenta.Data
                     transaction: tran
                 );
 
-                await Connection.ExecuteAsync(command);
-
-                return 1;
+                return await Connection.ExecuteAsync(command);
             }
             catch (Exception ex)
             {
@@ -226,13 +227,8 @@ namespace VontaGenta.Data
             }
         }
 
-        public async Task<int> DeleteClient(Client client, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
+        public async Task<int> DeleteClient(int clientId, string userId, CancellationToken ct, NpgsqlTransaction? tx = null)
         {
-            if (client == null)
-            {
-                return 0;
-            }
-
             try
             {
                 var tran = tx ?? Transaction;
@@ -240,18 +236,23 @@ namespace VontaGenta.Data
                 var dataLog = new DataLog
                 {
                     EntityName = EntityName,
-                    EntityID = client.ID,
+                    EntityID = clientId,
                     Action = AppActions.Delete,
                     EntryTimestamp = DateTime.UtcNow,
-                    AppUserID = userId,
-                    Json = JsonConvert.SerializeObject(client)
+                    AppUserID = userId
                 };
 
-                var parameters = new { client.ID, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
-                var sql = @"DELETE FROM clients WHERE clients.id = @ID;
-
+                // Using Postgres's json_build_object() as we do not have a client object to serialise.
+                var parameters = new { clientId, dataLog.EntityName, dataLog.EntityID, dataLog.Action, dataLog.EntryTimestamp, dataLog.AppUserID, dataLog.Json };
+                var sql = @"WITH d AS (
+                                DELETE FROM clients WHERE id = @ID
+                                RETURNING id, name, description, orgid, appuserid
+                            )
                             INSERT INTO datalogs (entityname, entityid, action, entrytimestamp, appuserid, json)
-                            VALUES (@EntityName, @EntityID, @Action, @EntryTimestamp, @AppUserID, @Json);";
+                            SELECT @EntityName, d.id, @Action, @EntryTimestamp, @AppUserID,
+                                   json_build_object('ID', d.id, 'Name', d.name, 'Description', d.description,
+                                                     'OrgID', d.orgid, 'AppUserID', d.appuserid)::text
+                            FROM d;";
 
                 var command = new CommandDefinition(
                     sql,
@@ -260,9 +261,7 @@ namespace VontaGenta.Data
                     transaction: tran
                 );
 
-                var affectedRows = await Connection.ExecuteAsync(command);
-
-                return 1;
+                return await Connection.ExecuteAsync(command);
             }
             catch (Exception ex)
             {

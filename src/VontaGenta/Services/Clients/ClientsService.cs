@@ -107,37 +107,11 @@ namespace VontaGenta.Services
 
             await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
-            Client? storedClient;
-
             try
             {
-                storedClient = await _unitOfWork.Clients.GetClient(client.ID, ct);
+                var affectedRows = await _unitOfWork.Clients.UpdateClient(client, userId, ct);
 
-                if (storedClient == null)
-                {
-                    await _unitOfWork.CommitAsync(ct);
-                    dto.AppError = "Error: Not found";
-                    return dto;
-                }
-
-                await _unitOfWork.CommitAsync(ct);
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollbackAsync(ct);
-                dto.AppError = "Error: Error on update";
-                return dto;
-            }
-
-            client.MapTo(storedClient);
-
-            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
-
-            try
-            {
-                var result = await _unitOfWork.Clients.UpdateClient(storedClient, userId, ct);
-
-                if (result > 0)
+                if (affectedRows > 0)
                 {
                     await _unitOfWork.CommitAsync(ct);
                     dto.Status = "Item updated";
@@ -165,33 +139,9 @@ namespace VontaGenta.Services
 
             await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
 
-            Client? client;
-
             try
             {
-                client = await _unitOfWork.Clients.GetClient(id, ct);
-
-                if (client == null)
-                {
-                    await _unitOfWork.CommitAsync(ct);
-                    dto.AppError = "Error: Not found";
-                    return dto;
-                }
-
-                await _unitOfWork.CommitAsync(ct);
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollbackAsync(ct);
-                dto.AppError = "Error: Error on delete";
-                return dto;
-            }
-
-            await _unitOfWork.BeginTransactionAsync(activeOrgId, IsolationLevel.ReadCommitted, ct);
-
-            try
-            {
-                var affectedRows = await _unitOfWork.Clients.DeleteClient(client, userId, ct);
+                var affectedRows = await _unitOfWork.Clients.DeleteClient(id, userId, ct);
 
                 if (affectedRows > 0)
                 {
