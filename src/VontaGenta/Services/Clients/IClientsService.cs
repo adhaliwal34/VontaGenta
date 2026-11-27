@@ -4,11 +4,10 @@ namespace VontaGenta.Services
 {
     public interface IClientsService
     {
-        Task<DeleteClientDTO> DeleteClient(int id, string userId, CancellationToken ct);
-        Task<GetClientsDTO> GetClientsForOrg(int orgId, string userId, CancellationToken ct);
-        Task<GetClientDTO> GetClient(int id, string userId, CancellationToken ct);
-        Task<GetClientDTO> GetClientAndRelatedFields(int id, string userId, CancellationToken ct);
-        Task<SaveClientDTO> SaveClient(Client client, string userId, CancellationToken ct);
-        Task<UpdateClientDTO> UpdateClient(Client client, string userId, CancellationToken ct);
+        Task<GetClientsDTO> GetClientsForOrg(int activeOrgId, string userId, CancellationToken ct);
+        Task<GetClientDTO> GetClientAndRelatedFields(int activeOrgId, int id, CancellationToken ct);
+        Task<SaveClientDTO> SaveClient(int activeOrgId, Client client, string userId, CancellationToken ct);
+        Task<UpdateClientDTO> UpdateClient(int activeOrgId, Client client, string userId, CancellationToken ct);
+        Task<DeleteClientDTO> DeleteClient(int activeOrgId, int id, string userId, CancellationToken ct);
     }
 }

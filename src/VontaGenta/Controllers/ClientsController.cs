@@ -75,7 +75,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _clientsService.GetClientAndRelatedFields(id.Value, user.Id, ct);
+            var dto = await _clientsService.GetClientAndRelatedFields(activeOrg.ID, id.Value, ct);
 
             if (!dto.IsSuccess)
             {
@@ -136,7 +136,7 @@ namespace VontaGenta.Controllers
 
                 vm.MapTo(client);
 
-                var dto = await _clientsService.SaveClient(client, user.Id, ct);
+                var dto = await _clientsService.SaveClient(activeOrg.ID, client, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
@@ -173,7 +173,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _clientsService.GetClientAndRelatedFields(id.Value, user.Id, ct);
+            var dto = await _clientsService.GetClientAndRelatedFields(activeOrg.ID, id.Value, ct);
 
             if (!dto.IsSuccess)
             {
@@ -213,7 +213,7 @@ namespace VontaGenta.Controllers
 
                 vm.MapTo(editedClient);
 
-                var dto = await _clientsService.UpdateClient(editedClient, user.Id, ct);
+                var dto = await _clientsService.UpdateClient(activeOrg.ID, editedClient, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
@@ -250,7 +250,7 @@ namespace VontaGenta.Controllers
                 return RedirectToAction("Index", "Orgs", new { error = 1 });
             }
 
-            var dto = await _clientsService.GetClientAndRelatedFields(id.Value, user.Id, ct);
+            var dto = await _clientsService.GetClientAndRelatedFields(activeOrg.ID, id.Value, ct);
 
             if (!dto.IsSuccess)
             {
@@ -281,7 +281,7 @@ namespace VontaGenta.Controllers
 
             try
             {
-                var dto = await _clientsService.DeleteClient(id, user.Id, ct);
+                var dto = await _clientsService.DeleteClient(activeOrg.ID, id, user.Id, ct);
 
                 if (!dto.IsSuccess)
                 {
